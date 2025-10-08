@@ -12,6 +12,9 @@ import { Badge } from '@/components/ui/badge';
 import { Upload, Download, Plus, Trash2, AlertCircle, CheckCircle } from 'lucide-react';
 import { GRADES, isValidGrade } from '@/lib/validations';
 import { SortingControls } from '@/components/ui/SortingControls';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Copy, FileSpreadsheet, Save } from 'lucide-react';
+import { useRef } from 'react';
 
 interface BulkResultData {
   regNo: string;
@@ -25,7 +28,6 @@ interface BulkResultEntryProps {
   onTemplateDownload: () => void;
 }
 
-const GRADES = ['O', 'A+', 'A', 'B+', 'B', 'C', 'P', 'U', 'RA', 'UA'];
 
 export function BulkResultEntry({ subjects, onDataSubmit, onTemplateDownload }: BulkResultEntryProps) {
   const [bulkData, setBulkData] = useState<BulkResultData[]>([]);
@@ -104,7 +106,7 @@ export function BulkResultEntry({ subjects, onDataSubmit, onTemplateDownload }: 
         const currentSubjects = subjects.length > 0 ? subjects : detectedSubjects;
         currentSubjects.forEach((subject, subjectIndex) => {
           const gradeValue = cells[subjectIndex + 2]?.trim() || '';
-          if (gradeValue && !GRADES.includes(gradeValue)) {
+          if (gradeValue && !GRADES.includes((gradeValue as any))) {
             throw new Error(`Line ${lineIndex + 1}: Invalid grade "${gradeValue}" for ${subject}. Valid grades: ${GRADES.join(', ')}`);
           }
           grades[subject] = gradeValue;
@@ -195,7 +197,7 @@ export function BulkResultEntry({ subjects, onDataSubmit, onTemplateDownload }: 
       }
       
       Object.entries(row.grades).forEach(([subject, grade]) => {
-        if (grade && grade !== 'NONE' && !GRADES.includes(grade)) {
+        if (grade && grade !== 'NONE' && !GRADES.includes(( grade as any))) {
           errors.push(`Row ${index + 1}: Invalid grade "${grade}" for ${subject}. Valid grades: ${GRADES.join(', ')}`);
         }
       });
