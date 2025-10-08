@@ -3,8 +3,11 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import ModernAssignmentManagement from "@/components/admin/ModernAssignmentManagement";
-import { BookOpen, ArrowLeft } from "lucide-react";
+import { BookOpen, ArrowLeft, FileSpreadsheet } from "lucide-react";
 import { motion } from "framer-motion";
+import { ExcelExportDialog, ExcelExportField } from '@/components/admin/ExcelExportDialog';
+import { useExcelExport } from '@/hooks/useExcelExport';
+import { Button } from '@/components/ui/button';
 
 interface Assignment {
   id: string;
@@ -22,6 +25,33 @@ export default function AssignmentsPage() {
   const [assignments, setAssignments] = useState<Assignment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Excel export configuration for assignment submissions
+  const exportFields: ExcelExportField[] = [
+    { key: 'register_number', label: 'Register Number', selected: true },
+    { key: 'name', label: 'Student Name', selected: true },
+    { key: 'email', label: 'Email', selected: true },
+    { key: 'class_year', label: 'Class/Year', selected: true },
+    { key: 'assignment_title', label: 'Assignment Title', selected: true },
+    { key: 'status', label: 'Status', selected: true },
+    { key: 'submitted_at', label: 'Submitted At', selected: true, formatter: (v) => v !== '-' ? new Date(v).toLocaleString() : '-' },
+    { key: 'marks', label: 'Marks', selected: true },
+    { key: 'due_date', label: 'Due Date', selected: false, formatter: (v) => v !== '-' ? new Date(v).toLocaleString() : '-' },
+  ];
+
+  const [submissionData, setSubmissionData] = useState<any[]>([]);
+
+  const {
+    isExportDialogOpen,
+    exportFields: fields,
+    openExportDialog,
+    closeExportDialog
+  } = useExcelExport({
+    data: submissionData,
+    fields: exportFields,
+    fileName: 'assignment_submissions',
+    sheetName: 'Submissions'
+  });
+
   useEffect(() => {
     fetchAssignments();
   }, []);
@@ -30,13 +60,25 @@ export default function AssignmentsPage() {
     setIsLoading(true);
     try {
       const response = await fetch("/api/admin/assignments");
-      const data = await response.json();
-      setAssignments(data.data || []);
+      if (response.ok) {
+        const result = await response.json();
+        // API returns { success: true, data: [...] } format
+        setAssignments(result.data || []);
+      } else {
+        console.error("Failed to fetch assignments:", response.status);
+        setAssignments([]);
+      }
     } catch (error) {
+      console.error("Error fetching assignments:", error);
       setAssignments([]);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleExportSubmissions = (exportData: any[]) => {
+    setSubmissionData(exportData);
+    openExportDialog();
   };
 
   const handleAddAssignment = async (assignment: any) => {
@@ -67,7 +109,7 @@ export default function AssignmentsPage() {
   };
 
   const exportToExcel = (data: any[], filename: string) => {
-    // defer to top-level admin for actual export on this page; noop
+    openExportDialog();
   };
 
   const formatDateTime = (dateString: string) => {
@@ -175,10 +217,23 @@ export default function AssignmentsPage() {
             onUpdateAssignment={handleUpdateAssignment}
             onDeleteAssignment={handleDeleteAssignment}
             formatDateTime={formatDateTime}
-            exportToExcel={exportToExcel}
+            onExport={handleExportSubmissions}
           />
         </motion.div>
       </div>
+
+      {/* Excel Export Dialog */}
+      <ExcelExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={closeExportDialog}
+        title="Export Assignment Submissions"
+        data={submissionData}
+        fields={fields}
+        fileName="assignment_submissions"
+        sheetName="Submissions"
+        headerTitle="IT Department - Assignment Management"
+        headerSubtitle="Assignment Submissions Export Report"
+      />
     </motion.div>
   );
 }

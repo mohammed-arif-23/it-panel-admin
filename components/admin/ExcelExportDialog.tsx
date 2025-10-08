@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Download, FileSpreadsheet, Image as ImageIcon, CheckCircle, XCircle } from 'lucide-react';
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 
 export interface ExcelExportField {
   key: string;
@@ -81,66 +81,82 @@ export function ExcelExportDialog({
         return;
       }
 
-      // Create workbook
-      const wb = XLSX.utils.book_new();
-      
-      // Prepare data for export
-      const exportData: any[][] = [];
-      
-      // Add header rows with logo placeholder
-      exportData.push([headerTitle]); // Main title
-      exportData.push([headerSubtitle]); // Subtitle
-      exportData.push([`Generated on: ${new Date().toLocaleString()}`]); // Timestamp
-      exportData.push([]); // Empty row for spacing
-      exportData.push([`Logo: ${logoUrl}`]); // Logo URL reference
-      exportData.push([]); // Empty row for spacing
-      
-      // Add column headers
-      const headers = selectedFields.map(f => f.label);
-      exportData.push(headers);
-      
-      // Add data rows
-      data.forEach(row => {
-        const rowData = selectedFields.map(field => {
-          const value = row[field.key];
-          if (field.formatter) {
-            return field.formatter(value);
-          }
-          return value ?? '';
+      // Create workbook and worksheet using ExcelJS
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet(sheetName);
+
+      // Ensure at least 8 columns (A-H) so image range C1:H6 is valid
+      const totalCols = Math.max(8, selectedFields.length);
+      worksheet.columns = Array.from({ length: totalCols }).map((_, i) => ({
+        width: 20,
+        style: { font: { name: 'Times New Roman', size: 12 } }
+      }));
+
+      // No textual header info as per request; image first then data
+
+      // Attempt to embed the logo image (placed around A5)
+      try {
+        if (logoUrl) {
+          const resp = await fetch(logoUrl);
+          const contentType = resp.headers.get('content-type') || '';
+          const arrayBuf = await resp.arrayBuffer();
+          const bytes = new Uint8Array(arrayBuf);
+          let binary = '';
+          for (let i = 0; i < bytes.byteLength; i++) binary += String.fromCharCode(bytes[i]);
+          const base64 = btoa(binary);
+          const ext = contentType.includes('png') ? 'png' : (contentType.includes('jpeg') || contentType.includes('jpg')) ? 'jpeg' : 'png';
+          const imageId = workbook.addImage({ base64, extension: ext as 'png' | 'jpeg' });
+          // Place image spanning columns C to H and rows 1 to 6
+          worksheet.addImage(imageId, 'C1:H6');
+        }
+      } catch (e) {
+        console.warn('Logo embedding failed; continuing without image', e);
+      }
+
+      // First data header row at row 7, bold
+      const headerRowIndex = 7;
+      const headerLabels = selectedFields.map(f => f.label);
+      const headerRow = worksheet.getRow(headerRowIndex);
+      headerRow.values = headerLabels;
+      headerRow.font = { name: 'Times New Roman', size: 12, bold: true };
+      headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+      headerRow.height = 18;
+
+      // Data rows (start after header)
+      for (const r of data) {
+        const values = selectedFields.map(field => {
+          const value = r[field.key];
+          return field.formatter ? field.formatter(value) : (value ?? '');
         });
-        exportData.push(rowData);
+        const newRow = worksheet.addRow(values);
+        newRow.font = { name: 'Times New Roman', size: 12 };
+      }
+
+      // Adjust column widths based on header length
+      worksheet.columns.forEach((col: any, idx: number) => {
+        const hdr = headerLabels[idx] || '';
+        col.width = Math.max(col.width || 20, hdr.length + 5);
       });
 
-      // Create worksheet
-      const ws = XLSX.utils.aoa_to_sheet(exportData);
-      
-      // Style the header rows (merge cells for title rows)
-      ws['!merges'] = [
-        { s: { r: 0, c: 0 }, e: { r: 0, c: selectedFields.length - 1 } }, // Main title
-        { s: { r: 1, c: 0 }, e: { r: 1, c: selectedFields.length - 1 } }, // Subtitle
-        { s: { r: 2, c: 0 }, e: { r: 2, c: selectedFields.length - 1 } }, // Timestamp
-        { s: { r: 4, c: 0 }, e: { r: 4, c: selectedFields.length - 1 } }, // Logo URL
-      ];
-      
-      // Set column widths
-      const colWidths = selectedFields.map(() => ({ wch: 20 }));
-      ws['!cols'] = colWidths;
-      
-      // Add worksheet to workbook
-      XLSX.utils.book_append_sheet(wb, ws, sheetName);
-      
-      // Generate file name with timestamp
+      // Generate and download file
       const timestamp = new Date().toISOString().split('T')[0];
       const fullFileName = `${fileName}_${timestamp}.xlsx`;
-      
-      // Write file
-      XLSX.writeFile(wb, fullFileName);
-      
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fullFileName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
       // Close dialog after successful export
       setTimeout(() => {
         setIsExporting(false);
         onClose();
-      }, 1000);
+      }, 500);
     } catch (error) {
       console.error('Export failed:', error);
       alert('Failed to export data. Please try again.');
@@ -161,7 +177,7 @@ export function ExcelExportDialog({
           </DialogTitle>
           <DialogDescription>
             Select the fields you want to include in the Excel export.
-            The export will include a header with the department logo.
+            The export will embed the department logo at the top of the sheet.
           </DialogDescription>
         </DialogHeader>
 
@@ -171,7 +187,7 @@ export function ExcelExportDialog({
             <ImageIcon className="h-5 w-5 text-blue-600" />
             <div className="flex-1">
               <p className="text-sm font-medium text-blue-900">Header Image</p>
-              <p className="text-xs text-blue-700">Logo will be referenced in the export</p>
+              <p className="text-xs text-blue-700">Logo will be embedded in the export</p>
             </div>
           </div>
 

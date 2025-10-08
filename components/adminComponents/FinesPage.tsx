@@ -5,9 +5,10 @@ import Link from "next/link";
 import ModernFineManagement from "@/components/admin/ModernFineManagement";
 import FineCreationPanel from "@/components/admin/FineCreationPanel";
 import ModernPageHeader from "@/components/admin/ModernPageHeader";
-import { DollarSign, ArrowLeft } from "lucide-react";
+import { DollarSign, ArrowLeft, FileSpreadsheet } from "lucide-react";
 import BackButton from "@/components/admin/BackButton";
-import { exportArrayToExcel } from "@/lib/exportExcel";
+import { ExcelExportDialog, ExcelExportField } from '@/components/admin/ExcelExportDialog';
+import { useExcelExport } from '@/hooks/useExcelExport';
 
 interface Fine {
   id: string;
@@ -24,6 +25,30 @@ export default function FinesPage() {
   const [fines, setFines] = useState<Fine[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [filters, setFilters] = useState({ class: "all", status: "all", type: "all" });
+
+  // Excel export configuration
+  const exportFields: ExcelExportField[] = [
+    { key: 'student_name', label: 'Student Name', selected: true },
+    { key: 'register_number', label: 'Register Number', selected: true },
+    { key: 'fine_type', label: 'Fine Type', selected: true },
+    { key: 'reference_date', label: 'Reference Date', selected: true, formatter: (v) => new Date(v).toLocaleDateString() },
+    { key: 'base_amount', label: 'Fine Amount', selected: true, formatter: (v) => `₹${v}` },
+    { key: 'payment_status', label: 'Payment Status', selected: true },
+    { key: 'paid_amount', label: 'Paid Amount', selected: true, formatter: (v) => v ? `₹${v}` : '₹0' },
+    { key: 'created_at', label: 'Created Date', selected: false, formatter: (v) => new Date(v).toLocaleDateString() },
+  ];
+
+  const {
+    isExportDialogOpen,
+    exportFields: fields,
+    openExportDialog,
+    closeExportDialog
+  } = useExcelExport({
+    data: fines,
+    fields: exportFields,
+    fileName: 'student_fines',
+    sheetName: 'Fines'
+  });
 
   const fetchFines = async () => {
     setIsLoading(true);
@@ -58,7 +83,7 @@ export default function FinesPage() {
   };
 
   const exportToExcel = (data: any[], filename: string) => {
-    exportArrayToExcel(data, filename);
+    openExportDialog();
   };
   const formatDateTime = (d: string) => new Date(d).toLocaleString();
 
@@ -118,6 +143,19 @@ export default function FinesPage() {
           formatDateTime={formatDateTime}
         />
       </div>
+
+      {/* Excel Export Dialog */}
+      <ExcelExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={closeExportDialog}
+        title="Export Fines Data"
+        data={fines}
+        fields={fields}
+        fileName="student_fines"
+        sheetName="Fines"
+        headerTitle="IT Department - Fine Management"
+        headerSubtitle="Student Fines Export Report"
+      />
     </div>
   );
 }

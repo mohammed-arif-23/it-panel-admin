@@ -19,9 +19,12 @@ import {
   RefreshCw,
   AlertCircle,
   Check,
-  X
+  X,
+  FileSpreadsheet
 } from 'lucide-react';
 import PageTransition from '@/components/ui/PageTransition';
+import { ExcelExportDialog, ExcelExportField } from '@/components/admin/ExcelExportDialog';
+import { useExcelExport } from '@/hooks/useExcelExport';
 
 interface Student {
   id: string;
@@ -51,6 +54,30 @@ export default function StudentsManagement() {
   const [selectedStudents, setSelectedStudents] = useState<string[]>([]);
   const [bulkAction, setBulkAction] = useState<'none' | 'delete' | 'export'>('none');
   const studentsPerPage = 20;
+
+  // Excel export configuration
+  const exportFields: ExcelExportField[] = [
+    { key: 'register_number', label: 'Register Number', selected: true },
+    { key: 'name', label: 'Student Name', selected: true },
+    { key: 'email', label: 'Email Address', selected: true },
+    { key: 'mobile', label: 'Mobile Number', selected: true },
+    { key: 'class_year', label: 'Class/Year', selected: true },
+    { key: 'email_verified', label: 'Email Verified', selected: true, formatter: (v) => v ? 'Yes' : 'No' },
+    { key: 'created_at', label: 'Registration Date', selected: true, formatter: (v) => new Date(v).toLocaleDateString() },
+    { key: 'updated_at', label: 'Last Updated', selected: false, formatter: (v) => new Date(v).toLocaleDateString() },
+  ];
+
+  const {
+    isExportDialogOpen,
+    exportFields: fields,
+    openExportDialog,
+    closeExportDialog
+  } = useExcelExport({
+    data: selectedStudents.length > 0 ? students.filter(s => selectedStudents.includes(s.id)) : filteredStudents,
+    fields: exportFields,
+    fileName: 'students_list',
+    sheetName: 'Students'
+  });
 
   // Redirect if not authenticated or not authorized
   useEffect(() => {
@@ -216,35 +243,9 @@ export default function StudentsManagement() {
         console.error('Error deleting students:', err);
       }
     } else if (bulkAction === 'export') {
-      try {
-        const response = await fetch('/api/admin/students/export', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ids: selectedStudents }),
-        });
-        
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `students-export-${new Date().toISOString().split('T')[0]}.xlsx`;
-          document.body.appendChild(a);
-          a.click();
-          window.URL.revokeObjectURL(url);
-          document.body.removeChild(a);
-          setSelectedStudents([]);
-          setBulkAction('none');
-        } else {
-          const data = await response.json();
-          alert(data.error || 'Failed to export students');
-        }
-      } catch (err) {
-        alert('Failed to export students');
-        console.error('Error exporting students:', err);
-      }
+      openExportDialog();
+      setSelectedStudents([]);
+      setBulkAction('none');
     }
   };
 
@@ -298,6 +299,15 @@ export default function StudentsManagement() {
               </div>
               
               <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={openExportDialog}
+                  disabled={loading || filteredStudents.length === 0}
+                >
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  Export All
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm"
@@ -611,6 +621,19 @@ export default function StudentsManagement() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Excel Export Dialog */}
+        <ExcelExportDialog
+          isOpen={isExportDialogOpen}
+          onClose={closeExportDialog}
+          title="Export Students Data"
+          data={selectedStudents.length > 0 ? students.filter(s => selectedStudents.includes(s.id)) : filteredStudents}
+          fields={fields}
+          fileName="students_list"
+          sheetName="Students"
+          headerTitle="IT Department - Student Management"
+          headerSubtitle={`Students Export Report - ${selectedStudents.length > 0 ? 'Selected Students' : 'All Students'}`}
+        />
       </div>
     </PageTransition>
   );

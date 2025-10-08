@@ -15,9 +15,12 @@ import {
   CheckCircle,
   XCircle,
   Calendar,
-  Award
+  Award,
+  FileSpreadsheet
 } from 'lucide-react';
 import PageTransition from '@/components/ui/PageTransition';
+import { ExcelExportDialog, ExcelExportField } from '@/components/admin/ExcelExportDialog';
+import { useExcelExport } from '@/hooks/useExcelExport';
 
 interface Registration {
   id: string;
@@ -43,6 +46,29 @@ export default function RegistrationManagement() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Excel export configuration
+  const exportFields: ExcelExportField[] = [
+    { key: 'student.name', label: 'Student Name', selected: true },
+    { key: 'student.register_number', label: 'Register Number', selected: true },
+    { key: 'student.email', label: 'Email', selected: true },
+    { key: 'student.class_year', label: 'Class/Year', selected: true },
+    { key: 'registration_type', label: 'Registration Type', selected: true },
+    { key: 'registration_date', label: 'Registration Date', selected: true, formatter: (v) => new Date(v).toLocaleDateString() },
+    { key: 'is_active', label: 'Status', selected: true, formatter: (v) => v ? 'Active' : 'Inactive' },
+  ];
+
+  const {
+    isExportDialogOpen,
+    exportFields: fields,
+    openExportDialog,
+    closeExportDialog
+  } = useExcelExport({
+    data: filteredRegistrations,
+    fields: exportFields,
+    fileName: 'student_registrations',
+    sheetName: 'Registrations'
+  });
 
   // Redirect if not authenticated
   useEffect(() => {
@@ -186,14 +212,25 @@ export default function RegistrationManagement() {
                 </div>
               </div>
               
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={handleRefresh}
-                disabled={loading}
-              >
-                <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={openExportDialog}
+                  disabled={loading || filteredRegistrations.length === 0}
+                >
+                  <FileSpreadsheet className="h-4 w-4 mr-2" />
+                  Export
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={handleRefresh}
+                  disabled={loading}
+                >
+                  <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+                </Button>
+              </div>
             </div>
           </div>
         </div>
@@ -407,6 +444,19 @@ export default function RegistrationManagement() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Excel Export Dialog */}
+        <ExcelExportDialog
+          isOpen={isExportDialogOpen}
+          onClose={closeExportDialog}
+          title="Export Registrations Data"
+          data={filteredRegistrations}
+          fields={fields}
+          fileName="student_registrations"
+          sheetName="Registrations"
+          headerTitle="IT Department - Registration Management"
+          headerSubtitle="Student Registrations Export Report"
+        />
       </div>
     </PageTransition>
   );

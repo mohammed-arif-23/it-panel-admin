@@ -78,7 +78,7 @@ interface ModernAssignmentManagementProps {
   onUpdateAssignment?: (id: string, assignment: any) => Promise<void>
   onDeleteAssignment: (id: string, title: string) => Promise<void>
   formatDateTime: (date: string) => string
-  exportToExcel?: (data: any[], filename: string) => void
+  onExport?: (data: any[]) => void
 }
 
 export default function ModernAssignmentManagement({
@@ -89,7 +89,7 @@ export default function ModernAssignmentManagement({
   onUpdateAssignment,
   onDeleteAssignment,
   formatDateTime,
-  exportToExcel
+  onExport
 }: ModernAssignmentManagementProps) {
   const [showAddForm, setShowAddForm] = useState(false)
   const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(null)
@@ -216,9 +216,10 @@ export default function ModernAssignmentManagement({
   }
 
   // Calculate statistics
-  const activeAssignments = assignments.filter(a => new Date(a.due_date) > new Date()).length
-  const totalSubmissions = assignments.reduce((sum, a) => sum + (a.submission_count || 0), 0)
-  const totalGraded = assignments.reduce((sum, a) => sum + (a.graded_count || 0), 0)
+  const assignmentsArray = Array.isArray(assignments) ? assignments : []
+  const activeAssignments = assignmentsArray.filter(a => new Date(a.due_date) > new Date()).length
+  const totalSubmissions = assignmentsArray.reduce((sum, a) => sum + (a.submission_count || 0), 0)
+  const totalGraded = assignmentsArray.reduce((sum, a) => sum + (a.graded_count || 0), 0)
 
   return (
     <div className="space-y-6">
@@ -479,7 +480,7 @@ export default function ModernAssignmentManagement({
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Assignments</p>
-                  <p className="text-3xl font-bold text-gray-900">{assignments.length}</p>
+                  <p className="text-3xl font-bold text-gray-900">{assignmentsArray.length}</p>
                 </div>
                 <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
                   <BookOpen className="h-6 w-6 text-blue-600" />
@@ -556,7 +557,7 @@ export default function ModernAssignmentManagement({
                   <RefreshCw className="h-6 w-6 animate-spin mr-2 text-blue-600" />
                   <span className="text-blue-600">Loading assignments...</span>
                 </div>
-              ) : assignments.length === 0 ? (
+              ) : assignmentsArray.length === 0 ? (
                 <div className="text-center py-12">
                   <BookOpen className="h-16 w-16 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No assignments found</h3>
@@ -585,7 +586,7 @@ export default function ModernAssignmentManagement({
                     </TableHeader>
                     <TableBody>
                       <AnimatePresence>
-                        {assignments.map((assignment) => (
+                        {assignmentsArray.map((assignment) => (
                           <motion.tr
                             key={assignment.id}
                             initial={{ opacity: 0, y: 10 }}
@@ -789,31 +790,36 @@ export default function ModernAssignmentManagement({
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => {
-                      if (exportToExcel && submissionData) {
-                        exportToExcel([
+                      if (onExport && submissionData) {
+                        const exportData = [
                           ...submissionData.submittedStudents.map(s => ({
-                            Register_Number: s.register_number,
-                            Name: s.name,
-                            Email: s.email,
-                            Class: s.class_year,
-                            Status: s.submissionDetails?.status || 'unknown',
-                            Submitted_At: s.submissionDetails?.submitted_at || '-',
-                            Marks: s.submissionDetails?.marks || '-'
+                            register_number: s.register_number,
+                            name: s.name,
+                            email: s.email,
+                            class_year: s.class_year,
+                            assignment_title: selectedAssignment?.title || '',
+                            status: s.submissionDetails?.status || 'submitted',
+                            submitted_at: s.submissionDetails?.submitted_at || '-',
+                            marks: s.submissionDetails?.marks || '-',
+                            due_date: selectedAssignment?.due_date || ''
                           })),
                           ...submissionData.notSubmittedStudents.map(s => ({
-                            Register_Number: s.register_number,
-                            Name: s.name,
-                            Email: s.email,
-                            Class: s.class_year,
-                            Status: 'not_submitted',
-                            Submitted_At: '-',
-                            Marks: '-'
+                            register_number: s.register_number,
+                            name: s.name,
+                            email: s.email,
+                            class_year: s.class_year,
+                            assignment_title: selectedAssignment?.title || '',
+                            status: 'not_submitted',
+                            submitted_at: '-',
+                            marks: '-',
+                            due_date: selectedAssignment?.due_date || ''
                           }))
-                        ], `${selectedAssignment?.title}_submissions`)
+                        ];
+                        onExport(exportData);
                       }
                     }}
                     className="w-full px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-                    disabled={!submissionData || !exportToExcel}
+                    disabled={!submissionData || !onExport}
                   >
                     <Download className="h-4 w-4" />
                     Export to Excel

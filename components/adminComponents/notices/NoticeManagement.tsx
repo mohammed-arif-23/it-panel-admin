@@ -16,10 +16,13 @@ import {
   Upload,
   X,
   Save,
-  AlertTriangle
+  AlertTriangle,
+  FileSpreadsheet
 } from 'lucide-react'
 import { Button } from '../../ui/button'
 import { Alert, AlertDescription } from '../../ui/alert'
+import { ExcelExportDialog, ExcelExportField } from '@/components/admin/ExcelExportDialog'
+import { useExcelExport } from '@/hooks/useExcelExport'
 
 interface Notice {
   id?: string
@@ -76,6 +79,33 @@ export default function NoticeManagement() {
   const [filterPriority, setFilterPriority] = useState('all')
   const [alertMessage, setAlertMessage] = useState('')
   const [alertType, setAlertType] = useState<'success' | 'error' | 'info'>('info')
+
+  // Excel export configuration
+  const exportFields: ExcelExportField[] = [
+    { key: 'title', label: 'Notice Title', selected: true },
+    { key: 'content', label: 'Content', selected: true },
+    { key: 'notice_type', label: 'Notice Type', selected: true },
+    { key: 'priority', label: 'Priority', selected: true },
+    { key: 'target_audience', label: 'Target Audience', selected: true },
+    { key: 'is_published', label: 'Published', selected: true, formatter: (v) => v ? 'Yes' : 'No' },
+    { key: 'published_at', label: 'Published Date', selected: true, formatter: (v) => v ? new Date(v).toLocaleDateString() : 'Not Published' },
+    { key: 'expires_at', label: 'Expires Date', selected: false, formatter: (v) => v ? new Date(v).toLocaleDateString() : 'No Expiry' },
+    { key: 'views_count', label: 'Views Count', selected: false },
+    { key: 'created_by', label: 'Created By', selected: false },
+    { key: 'created_at', label: 'Created Date', selected: false, formatter: (v) => new Date(v).toLocaleDateString() },
+  ]
+
+  const {
+    isExportDialogOpen,
+    exportFields: fields,
+    openExportDialog,
+    closeExportDialog
+  } = useExcelExport({
+    data: filteredNotices,
+    fields: exportFields,
+    fileName: 'notices_list',
+    sheetName: 'Notices'
+  })
 
   const [formData, setFormData] = useState<Notice>({
     title: '',
@@ -282,17 +312,28 @@ export default function NoticeManagement() {
             Create and manage college notices and announcements
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setShowForm(true)
-            setEditingNotice(null)
-            resetForm()
-          }}
-          className="flex items-center space-x-2"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Create Notice</span>
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={openExportDialog}
+            variant="outline"
+            className="flex items-center space-x-2"
+            disabled={filteredNotices.length === 0}
+          >
+            <FileSpreadsheet className="w-4 h-4" />
+            <span>Export</span>
+          </Button>
+          <Button
+            onClick={() => {
+              setShowForm(true)
+              setEditingNotice(null)
+              resetForm()
+            }}
+            className="flex items-center space-x-2"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Create Notice</span>
+          </Button>
+        </div>
       </div>
 
       {/* Alert */}
@@ -610,6 +651,19 @@ export default function NoticeManagement() {
           ))
         )}
       </div>
+
+      {/* Excel Export Dialog */}
+      <ExcelExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={closeExportDialog}
+        title="Export Notices Data"
+        data={filteredNotices}
+        fields={fields}
+        fileName="notices_list"
+        sheetName="Notices"
+        headerTitle="IT Department - Notice Management"
+        headerSubtitle="Notices Export Report"
+      />
     </div>
   )
 }

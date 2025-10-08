@@ -212,6 +212,22 @@ const tiles = [
     description: "CRUD operations",
     category: "System"
   },
+  { 
+    id: "admin/results", 
+    label: "Result Management", 
+    icon: Award,
+    color: "from-emerald-500 to-green-600",
+    description: "Manage student results",
+    category: "Academic"
+  },
+  { 
+    id: "admin/result-analysis", 
+    label: "Result Analysis", 
+    icon: BarChart3,
+    color: "from-blue-500 to-purple-600",
+    description: "Comprehensive result analytics",
+    category: "Analytics"
+  },
 ];
 
 export default function AdminRenewLanding() {

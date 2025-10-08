@@ -86,12 +86,14 @@ interface ModernSeminarHistoryProps {
   isLoading: boolean;
   onRefresh: () => void;
   formatDateTime: (date: string) => string;
+  onExport?: (data: any[]) => void;
 }
 
 export default function ModernSeminarHistory({
   isLoading,
   onRefresh,
   formatDateTime,
+  onExport,
 }: ModernSeminarHistoryProps) {
   const [selectedClass, setSelectedClass] = useState("all");
   const [startDate, setStartDate] = useState("");
@@ -182,26 +184,28 @@ export default function ModernSeminarHistory({
         break;
     }
 
-    // Use the export function passed from parent
-    const exportToExcel = (data: any[], fileName: string) => {
-      if (typeof window !== "undefined") {
-        import("xlsx").then((XLSX) => {
-          if (data.length === 0) {
-            alert("No data to export");
-            return;
-          }
-          const worksheet = XLSX.utils.json_to_sheet(data);
-          const workbook = XLSX.utils.book_new();
-          const fileNameWithDate = `${fileName}_${
-            new Date().toISOString().split("T")[0]
-          }.xlsx`;
-          XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-          XLSX.writeFile(workbook, fileNameWithDate);
-        });
-      }
-    };
-
-    exportToExcel(exportData, filename);
+    if (typeof onExport === 'function') {
+      onExport(exportData);
+    } else {
+      const exportToExcel = (data: any[], fileName: string) => {
+        if (typeof window !== "undefined") {
+          import("xlsx").then((XLSX) => {
+            if (data.length === 0) {
+              alert("No data to export");
+              return;
+            }
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const workbook = XLSX.utils.book_new();
+            const fileNameWithDate = `${fileName}_${
+              new Date().toISOString().split("T")[0]
+            }.xlsx`;
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+            XLSX.writeFile(workbook, fileNameWithDate);
+          });
+        }
+      };
+      exportToExcel(exportData, filename);
+    }
   };
 
   return (

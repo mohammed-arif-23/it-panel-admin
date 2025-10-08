@@ -1,14 +1,47 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import ModernSeminarHistory from "@/components/admin/ModernSeminarHistory";
-import { Users, ArrowLeft } from "lucide-react";
+import { Users, ArrowLeft, FileSpreadsheet } from "lucide-react";
 import { motion } from "framer-motion";
 import Link from "next/link";
+import { ExcelExportDialog, ExcelExportField } from '@/components/admin/ExcelExportDialog';
+import { useExcelExport } from '@/hooks/useExcelExport';
 
 export default function SeminarHistoryPage() {
+  const [historyData, setHistoryData] = useState<any[]>([]);
+  
+  // Excel export configuration
+  const exportFields: ExcelExportField[] = [
+    { key: 'student_name', label: 'Student Name', selected: true },
+    { key: 'register_number', label: 'Register Number', selected: true },
+    { key: 'seminar_title', label: 'Seminar Title', selected: true },
+    { key: 'seminar_date', label: 'Seminar Date', selected: true, formatter: (v) => new Date(v).toLocaleDateString() },
+    { key: 'status', label: 'Status', selected: true },
+    { key: 'marks_obtained', label: 'Marks', selected: true },
+    { key: 'feedback', label: 'Feedback', selected: false },
+    { key: 'class_year', label: 'Class/Year', selected: true },
+    { key: 'created_at', label: 'Record Date', selected: false, formatter: (v) => new Date(v).toLocaleDateString() },
+  ];
+
+  const {
+    isExportDialogOpen,
+    exportFields: fields,
+    openExportDialog,
+    closeExportDialog
+  } = useExcelExport({
+    data: historyData,
+    fields: exportFields,
+    fileName: 'seminar_history',
+    sheetName: 'History'
+  });
+
   const formatDateTime = (d: string) => new Date(d).toLocaleString();
   const onRefresh = async () => {};
+  const onExport = (data: any[]) => {
+    setHistoryData(data);
+    openExportDialog();
+  };
   
   return (
     <motion.div 
@@ -97,10 +130,24 @@ export default function SeminarHistoryPage() {
           <ModernSeminarHistory 
             isLoading={false} 
             onRefresh={onRefresh} 
-            formatDateTime={formatDateTime} 
+            formatDateTime={formatDateTime}
+            onExport={onExport}
           />
         </motion.div>
       </div>
+
+      {/* Excel Export Dialog */}
+      <ExcelExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={closeExportDialog}
+        title="Export Seminar History Data"
+        data={historyData}
+        fields={fields}
+        fileName="seminar_history"
+        sheetName="History"
+        headerTitle="IT Department - Seminar Management"
+        headerSubtitle="Seminar History Export Report"
+      />
     </motion.div>
   );
 }

@@ -1,17 +1,43 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import ModernHolidayManagement from "@/components/admin/ModernHolidayManagement";
 import ModernPageHeader from "@/components/admin/ModernPageHeader";
-import { CalendarDays, ArrowLeft } from "lucide-react";
-import { exportArrayToExcel } from "@/lib/exportExcel";
+import { CalendarDays, ArrowLeft, FileSpreadsheet } from "lucide-react";
 import BackButton from "@/components/admin/BackButton";
+import { ExcelExportDialog, ExcelExportField } from '@/components/admin/ExcelExportDialog';
+import { useExcelExport } from '@/hooks/useExcelExport';
 
 export default function HolidaysPage() {
+  const [holidays, setHolidays] = useState<any[]>([]);
+  
+  // Excel export configuration
+  const exportFields: ExcelExportField[] = [
+    { key: 'title', label: 'Holiday Title', selected: true },
+    { key: 'date', label: 'Holiday Date', selected: true, formatter: (v) => new Date(v).toLocaleDateString() },
+    { key: 'type', label: 'Holiday Type', selected: true },
+    { key: 'description', label: 'Description', selected: true },
+    { key: 'is_recurring', label: 'Recurring', selected: false, formatter: (v) => v ? 'Yes' : 'No' },
+    { key: 'created_at', label: 'Created Date', selected: false, formatter: (v) => new Date(v).toLocaleDateString() },
+  ];
+
+  const {
+    isExportDialogOpen,
+    exportFields: fields,
+    openExportDialog,
+    closeExportDialog
+  } = useExcelExport({
+    data: holidays,
+    fields: exportFields,
+    fileName: 'holidays_calendar',
+    sheetName: 'Holidays'
+  });
+
   const formatDateTime = (d: string) => new Date(d).toLocaleString();
   const onExport = (rows: any[] = [], filename: string = 'holidays') => {
-    exportArrayToExcel(rows, filename);
+    setHolidays(rows);
+    openExportDialog();
   };
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/50 page-transition">
@@ -59,6 +85,19 @@ export default function HolidaysPage() {
         </div>
         <ModernHolidayManagement onRefresh={() => {}} onExport={onExport} formatDateTime={formatDateTime} />
       </div>
+
+      {/* Excel Export Dialog */}
+      <ExcelExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={closeExportDialog}
+        title="Export Holidays Data"
+        data={holidays}
+        fields={fields}
+        fileName="holidays_calendar"
+        sheetName="Holidays"
+        headerTitle="IT Department - Holiday Management"
+        headerSubtitle="Academic Calendar Export Report"
+      />
     </div>
   );
 }

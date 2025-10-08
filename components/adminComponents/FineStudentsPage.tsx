@@ -1,12 +1,45 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import ModernFineStudentManagement from "@/components/admin/ModernFineStudentManagement";
 import ModernPageHeader from "@/components/admin/ModernPageHeader";
-import { DollarSign, ArrowLeft, Users } from "lucide-react";
+import { DollarSign, ArrowLeft, Users, FileSpreadsheet } from "lucide-react";
+import { ExcelExportDialog, ExcelExportField } from '@/components/admin/ExcelExportDialog';
+import { useExcelExport } from '@/hooks/useExcelExport';
 
 export default function FineStudentsPage() {
+  const [studentsData, setStudentsData] = useState<any[]>([]);
+  
+  // Excel export configuration
+  const exportFields: ExcelExportField[] = [
+    { key: 'name', label: 'Student Name', selected: true },
+    { key: 'register_number', label: 'Register Number', selected: true },
+    { key: 'email', label: 'Email', selected: true },
+    { key: 'class_year', label: 'Class/Year', selected: true },
+    { key: 'total_fines', label: 'Total Fines', selected: true, formatter: (v) => `₹${v}` },
+    { key: 'paid_amount', label: 'Paid Amount', selected: true, formatter: (v) => `₹${v}` },
+    { key: 'pending_amount', label: 'Pending Amount', selected: true, formatter: (v) => `₹${v}` },
+    { key: 'fine_count', label: 'Number of Fines', selected: true },
+    { key: 'last_payment_date', label: 'Last Payment', selected: false, formatter: (v) => v ? new Date(v).toLocaleDateString() : 'No Payment' },
+  ];
+
+  const {
+    isExportDialogOpen,
+    exportFields: fields,
+    openExportDialog,
+    closeExportDialog
+  } = useExcelExport({
+    data: studentsData,
+    fields: exportFields,
+    fileName: 'fine_students',
+    sheetName: 'Fine Students'
+  });
+
+  const onExport = (data: any[]) => {
+    setStudentsData(data);
+    openExportDialog();
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-purple-50/30 to-indigo-50/50 page-transition">
       {/* Premium Header */}
@@ -53,6 +86,19 @@ export default function FineStudentsPage() {
         </div>
         <ModernFineStudentManagement />
       </div>
+
+      {/* Excel Export Dialog */}
+      <ExcelExportDialog
+        isOpen={isExportDialogOpen}
+        onClose={closeExportDialog}
+        title="Export Fine Students Data"
+        data={studentsData}
+        fields={fields}
+        fileName="fine_students"
+        sheetName="Fine Students"
+        headerTitle="IT Department - Fine Management"
+        headerSubtitle="Student Fine Records Export Report"
+      />
     </div>
   );
 }
