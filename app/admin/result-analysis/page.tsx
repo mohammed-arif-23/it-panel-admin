@@ -6,8 +6,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RefreshCw } from 'lucide-react';
 import { ResultAnalysis } from '@/components/admin/ResultAnalysis';
+
+interface FilterOptions {
+  batches: string[];
+  departments: string[];
+  years: number[];
+  semesters: number[];
+}
 
 export default function ResultAnalysisPage() {
   const router = useRouter();
@@ -18,12 +25,44 @@ export default function ResultAnalysisPage() {
     year: '',
     semester: ''
   });
+  const [filterOptions, setFilterOptions] = useState<FilterOptions>({
+    batches: [],
+    departments: [],
+    years: [],
+    semesters: []
+  });
+  const [loadingFilters, setLoadingFilters] = useState(true);
+
+  // Fetch filter options from MongoDB
+  const fetchFilterOptions = async () => {
+    try {
+      setLoadingFilters(true);
+      const response = await fetch('/api/results/filters');
+      const data = await response.json();
+      
+      if (response.ok) {
+        setFilterOptions(data);
+      } else {
+        console.error('Failed to fetch filter options:', data.error);
+      }
+    } catch (error) {
+      console.error('Error fetching filter options:', error);
+    } finally {
+      setLoadingFilters(false);
+    }
+  };
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, router]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchFilterOptions();
+    }
+  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -63,70 +102,99 @@ export default function ResultAnalysisPage() {
         {/* Filters */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Select Result Sheet</CardTitle>
+            <CardTitle className="flex items-center justify-between">
+              Select Result Sheet
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={fetchFilterOptions}
+                disabled={loadingFilters}
+                className="flex items-center gap-2"
+              >
+                <RefreshCw className={`h-4 w-4 ${loadingFilters ? 'animate-spin' : ''}`} />
+                Refresh
+              </Button>
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Batch</label>
-                <Select value={filters.batch} onValueChange={(value) => setFilters(prev => ({ ...prev, batch: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select batch" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="2021-25">2021-25</SelectItem>
-                    <SelectItem value="2022-26">2022-26</SelectItem>
-                    <SelectItem value="2023-27">2023-27</SelectItem>
-                    <SelectItem value="2024-28">2024-28</SelectItem>
-                  </SelectContent>
-                </Select>
+            {loadingFilters ? (
+              <div className="flex items-center justify-center py-8">
+                <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+                <span className="ml-2">Loading filter options...</span>
               </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2">Batch</label>
+                  <Select value={filters.batch} onValueChange={(value) => setFilters(prev => ({ ...prev, batch: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select batch" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.batches.map(batch => (
+                        <SelectItem key={batch} value={batch}>{batch}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Department</label>
-                <Select value={filters.department} onValueChange={(value) => setFilters(prev => ({ ...prev, department: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select department" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="IT">Information Technology</SelectItem>
-                    <SelectItem value="CSE">Computer Science</SelectItem>
-                    <SelectItem value="ECE">Electronics & Communication</SelectItem>
-                    <SelectItem value="EEE">Electrical & Electronics</SelectItem>
-                    <SelectItem value="MECH">Mechanical</SelectItem>
-                    <SelectItem value="CIVIL">Civil</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Department</label>
+                  <Select value={filters.department} onValueChange={(value) => setFilters(prev => ({ ...prev, department: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select department" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.departments.map(dept => (
+                        <SelectItem key={dept} value={dept}>
+                          {dept === 'IT' ? 'Information Technology' :
+                           dept === 'CSE' ? 'Computer Science & Engineering' :
+                           dept === 'ECE' ? 'Electronics & Communication' :
+                           dept === 'EEE' ? 'Electrical & Electronics' :
+                           dept === 'MECH' ? 'Mechanical Engineering' :
+                           dept === 'CIVIL' ? 'Civil Engineering' : dept}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Year</label>
-                <Select value={filters.year} onValueChange={(value) => setFilters(prev => ({ ...prev, year: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1st Year</SelectItem>
-                    <SelectItem value="2">2nd Year</SelectItem>
-                    <SelectItem value="3">3rd Year</SelectItem>
-                    <SelectItem value="4">4th Year</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Year</label>
+                  <Select value={filters.year} onValueChange={(value) => setFilters(prev => ({ ...prev, year: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select year" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.years.map(year => (
+                        <SelectItem key={year} value={year.toString()}>
+                          {year === 1 ? '1st Year' :
+                           year === 2 ? '2nd Year' :
+                           year === 3 ? '3rd Year' :
+                           year === 4 ? '4th Year' : `${year}th Year`}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div>
-                <label className="block text-sm font-medium mb-2">Semester</label>
-                <Select value={filters.semester} onValueChange={(value) => setFilters(prev => ({ ...prev, semester: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select semester" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="1">1st Semester</SelectItem>
-                    <SelectItem value="2">2nd Semester</SelectItem>
-                  </SelectContent>
-                </Select>
+                <div>
+                  <label className="block text-sm font-medium mb-2">Semester</label>
+                  <Select value={filters.semester} onValueChange={(value) => setFilters(prev => ({ ...prev, semester: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select semester" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filterOptions.semesters.map(sem => (
+                        <SelectItem key={sem} value={sem.toString()}>
+                          {sem === 1 ? '1st Semester' : '2nd Semester'}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
 

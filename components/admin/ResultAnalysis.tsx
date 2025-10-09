@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { BarChart3, TrendingUp, Users, Award, AlertTriangle, Download } from 'lucide-react';
+import { BarChart3, TrendingUp, Users, Award, AlertTriangle, Download, Info } from 'lucide-react';
 
 interface AnalysisData {
   totalStudents: number;
@@ -111,7 +111,11 @@ export function ResultAnalysis({ filters }: ResultAnalysisProps) {
       <Card>
         <CardContent className="py-12 text-center">
           <BarChart3 className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-          <p className="text-muted-foreground">No analysis data available</p>
+          <p className="text-muted-foreground mb-4">Please select all filter options to view analysis</p>
+          <div className="flex items-center justify-center gap-2 text-sm text-blue-600">
+            <Info className="h-4 w-4" />
+            <span>Select Batch, Department, Year, and Semester from the filters above</span>
+          </div>
         </CardContent>
       </Card>
     );
@@ -127,13 +131,36 @@ export function ResultAnalysis({ filters }: ResultAnalysisProps) {
       {/* Header */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            Result Analysis Dashboard
+          <CardTitle className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Result Analysis Dashboard
+            </div>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.print()}
+              className="flex items-center gap-2"
+            >
+              <Download className="h-4 w-4" />
+              Export Report
+            </Button>
           </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            {filters.department} - {filters.batch} | Year {filters.year}, Semester {filters.semester}
-          </p>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-muted-foreground">
+              {filters.department === 'IT' ? 'Information Technology' :
+               filters.department === 'CSE' ? 'Computer Science & Engineering' :
+               filters.department === 'ECE' ? 'Electronics & Communication' :
+               filters.department === 'EEE' ? 'Electrical & Electronics' :
+               filters.department === 'MECH' ? 'Mechanical Engineering' :
+               filters.department === 'CIVIL' ? 'Civil Engineering' : filters.department} - {filters.batch} | Year {filters.year}, Semester {filters.semester}
+            </p>
+            <div className="flex items-center gap-4 text-xs text-muted-foreground">
+              <span>Generated on: {new Date().toLocaleDateString()}</span>
+              <span>•</span>
+              <span>Total Records: {analysisData.totalStudents}</span>
+            </div>
+          </div>
         </CardHeader>
       </Card>
 
@@ -192,15 +219,27 @@ export function ResultAnalysis({ filters }: ResultAnalysisProps) {
         <CardContent>
           <div className="space-y-4">
             {Object.entries(analysisData.gradeDistribution)
-              .sort(([a], [b]) => a.localeCompare(b))
+              .sort(([a], [b]) => {
+                // Sort grades in order: O, A+, A, B+, B, C, U, RA, UA
+                const gradeOrder = ['O', 'A+', 'A', 'B+', 'B', 'C', 'U', 'RA', 'UA'];
+                return gradeOrder.indexOf(a) - gradeOrder.indexOf(b);
+              })
               .map(([grade, count]) => {
-                const percentage = Math.round((count / (analysisData.totalStudents * analysisData.totalSubjects)) * 100);
+                const totalGrades = analysisData.totalStudents * analysisData.totalSubjects;
+                const percentage = totalGrades > 0 ? Math.round((count / totalGrades) * 100) : 0;
+                const getGradeColor = (grade: string) => {
+                  if (grade === 'O' || grade === 'A+') return 'bg-green-500';
+                  if (grade === 'A' || grade === 'B+') return 'bg-blue-500';
+                  if (grade === 'B' || grade === 'C') return 'bg-yellow-500';
+                  return 'bg-red-500';
+                };
                 return (
                   <div key={grade} className="space-y-2">
                     <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <Badge 
                           variant={grade === 'U' || grade === 'RA' || grade === 'UA' ? 'destructive' : 'secondary'}
+                          className={grade === 'O' || grade === 'A+' ? 'bg-green-100 text-green-800' : ''}
                         >
                           {grade}
                         </Badge>
@@ -239,7 +278,7 @@ export function ResultAnalysis({ filters }: ResultAnalysisProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {subjects.map(subject => {
                 const subjectData = analysisData.subjectWiseAnalysis[subject];
-                const passRate = Math.round((subjectData.passCount / subjectData.totalStudents) * 100);
+                const passRate = subjectData.totalStudents > 0 ? Math.round((subjectData.passCount / subjectData.totalStudents) * 100) : 0;
                 return (
                   <Card key={subject} className="p-4">
                     <h4 className="font-semibold mb-2">{subject}</h4>
@@ -273,7 +312,7 @@ export function ResultAnalysis({ filters }: ResultAnalysisProps) {
                 </div>
                 <div className="text-center p-4 bg-blue-50 rounded">
                   <div className="text-2xl font-bold text-blue-600">
-                    {Math.round((currentSubjectData.passCount / currentSubjectData.totalStudents) * 100)}%
+                    {currentSubjectData.totalStudents > 0 ? Math.round((currentSubjectData.passCount / currentSubjectData.totalStudents) * 100) : 0}%
                   </div>
                   <div className="text-sm text-muted-foreground">Pass Rate</div>
                 </div>
@@ -303,23 +342,33 @@ export function ResultAnalysis({ filters }: ResultAnalysisProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {analysisData.topPerformers.slice(0, 10).map((student, index) => (
-                <div key={student.regNo} className="flex items-center justify-between p-3 bg-green-50 rounded">
-                  <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-green-600 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                      {index + 1}
+              {analysisData.topPerformers.length > 0 ? (
+                analysisData.topPerformers.slice(0, 10).map((student, index) => {
+                  const excellenceRatio = Math.round((student.excellentGrades / student.totalGrades) * 100);
+                  return (
+                    <div key={student.regNo} className="flex items-center justify-between p-3 bg-green-50 rounded border border-green-200">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                          {index + 1}
+                        </div>
+                        <div>
+                          <div className="font-medium">{student.name}</div>
+                          <div className="text-sm text-muted-foreground">{student.regNo}</div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-sm font-medium text-green-700">{student.excellentGrades}/{student.totalGrades}</div>
+                        <div className="text-xs text-muted-foreground">{excellenceRatio}% excellence</div>
+                      </div>
                     </div>
-                    <div>
-                      <div className="font-medium">{student.name}</div>
-                      <div className="text-sm text-muted-foreground">{student.regNo}</div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-sm font-medium">{student.excellentGrades}/{student.totalGrades}</div>
-                    <div className="text-xs text-muted-foreground">Excellent grades</div>
-                  </div>
+                  );
+                })
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Award className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>No top performers found</p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
@@ -330,24 +379,33 @@ export function ResultAnalysis({ filters }: ResultAnalysisProps) {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {analysisData.needsAttention.slice(0, 10).map((student) => (
-                <div key={student.regNo} className="p-3 bg-red-50 rounded">
-                  <div className="flex items-center justify-between mb-2">
-                    <div>
-                      <div className="font-medium">{student.name}</div>
-                      <div className="text-sm text-muted-foreground">{student.regNo}</div>
-                    </div>
-                    <Badge variant="destructive">{student.failedSubjects.length} failed</Badge>
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    {student.failedSubjects.map(subject => (
-                      <Badge key={subject} variant="outline" className="text-xs">
-                        {subject}
+              {analysisData.needsAttention.length > 0 ? (
+                analysisData.needsAttention.slice(0, 10).map((student) => (
+                  <div key={student.regNo} className="p-3 bg-red-50 rounded border border-red-200">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <div className="font-medium">{student.name}</div>
+                        <div className="text-sm text-muted-foreground">{student.regNo}</div>
+                      </div>
+                      <Badge variant="destructive">
+                        {student.failedSubjects.length} subject{student.failedSubjects.length > 1 ? 's' : ''} failed
                       </Badge>
-                    ))}
+                    </div>
+                    <div className="flex flex-wrap gap-1">
+                      {student.failedSubjects.map(subject => (
+                        <Badge key={subject} variant="outline" className="text-xs border-red-300 text-red-700">
+                          {subject}
+                        </Badge>
+                      ))}
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  <Users className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                  <p>All students are performing well!</p>
                 </div>
-              ))}
+              )}
             </div>
           </CardContent>
         </Card>
