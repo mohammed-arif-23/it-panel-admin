@@ -53,11 +53,13 @@ self.addEventListener('fetch', (event) => {
           // Clone the response
           const responseToCache = response.clone();
           
-          // Cache dynamic content
-          caches.open(CACHE_NAME)
-            .then((cache) => {
-              cache.put(event.request, responseToCache);
-            });
+          // Cache dynamic content (only for GET requests)
+          if (event.request.method === 'GET') {
+            caches.open(CACHE_NAME)
+              .then((cache) => {
+                cache.put(event.request, responseToCache);
+              });
+          }
           
           return response;
         });

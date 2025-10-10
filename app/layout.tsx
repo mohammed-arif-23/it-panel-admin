@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from "next/font/google";
 import { AuthProvider } from '@/contexts/AuthContext';
+import { QueryProvider } from '@/components/providers/QueryProvider';
 import "./globals.css";
 import Script from 'next/script'
 
@@ -48,9 +49,11 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="IT Panel" />
       </head>
       <body className={inter.className}>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <QueryProvider>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </QueryProvider>
         <Script
           id="register-sw"
           strategy="afterInteractive"

@@ -59,8 +59,6 @@ export async function PATCH(request: NextRequest) {
         { status: 404 }
       );
     }
-
-    // Validate updates and prepare bulk operations
     const bulkOps: any[] = [];
     let newStudentsCount = 0;
     let updatedStudentsCount = 0;

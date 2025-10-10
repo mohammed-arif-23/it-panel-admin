@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, RefreshCw } from 'lucide-react';
-import { ResultAnalysis } from '@/components/admin/ResultAnalysis';
+import ResultAnalysis from '@/components/admin/ResultAnalysis';
 
 interface FilterOptions {
   batches: string[];
@@ -57,6 +57,52 @@ export default function ResultAnalysisPage() {
       router.push('/login');
     }
   }, [isAuthenticated, isLoading, router]);
+
+  useEffect(() => {
+    const loadYears = async () => {
+      if (!filters.department) {
+        setFilterOptions(prev => ({ ...prev, years: [], semesters: [] }));
+        setFilters(prev => ({ ...prev, year: '', semester: '' }));
+        return;
+      }
+      try {
+        const res = await fetch(`/api/results/options?department=${encodeURIComponent(filters.department)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setFilterOptions(prev => ({ ...prev, years: data.years || [], semesters: [] }));
+          setFilters(prev => ({ ...prev, year: '', semester: '' }));
+        }
+      } catch (e) {
+        console.error('Error loading years:', e);
+      }
+    };
+    if (filters.department) {
+      loadYears();
+    }
+  }, [filters.department]);
+
+  useEffect(() => {
+    const loadSemesters = async () => {
+      if (!filters.department || !filters.year) {
+        setFilterOptions(prev => ({ ...prev, semesters: [] }));
+        setFilters(prev => ({ ...prev, semester: '' }));
+        return;
+      }
+      try {
+        const res = await fetch(`/api/results/options?department=${encodeURIComponent(filters.department)}&year=${encodeURIComponent(filters.year)}`);
+        if (res.ok) {
+          const data = await res.json();
+          setFilterOptions(prev => ({ ...prev, semesters: data.semesters || [] }));
+          setFilters(prev => ({ ...prev, semester: '' }));
+        }
+      } catch (e) {
+        console.error('Error loading semesters:', e);
+      }
+    };
+    if (filters.year) {
+      loadSemesters();
+    }
+  }, [filters.year]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -124,27 +170,24 @@ export default function ResultAnalysisPage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div>
-                  <label className="block text-sm font-medium mb-2">Batch</label>
-                  <Select value={filters.batch} onValueChange={(value) => setFilters(prev => ({ ...prev, batch: value }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select batch" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {filterOptions.batches.map(batch => (
-                        <SelectItem key={batch} value={batch}>{batch}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Batch</label>
+                  <input
+                    type="text"
+                    value={filters.batch}
+                    onChange={(e) => setFilters(prev => ({ ...prev, batch: e.target.value }))}
+                    placeholder="e.g., 2023-2027"
+                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Department</label>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Department</label>
                   <Select value={filters.department} onValueChange={(value) => setFilters(prev => ({ ...prev, department: value }))}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select department" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       {filterOptions.departments.map(dept => (
                         <SelectItem key={dept} value={dept}>
                           {dept === 'IT' ? 'Information Technology' :
@@ -159,35 +202,32 @@ export default function ResultAnalysisPage() {
                   </Select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Year</label>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Year</label>
                   <Select value={filters.year} onValueChange={(value) => setFilters(prev => ({ ...prev, year: value }))}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       {filterOptions.years.map(year => (
                         <SelectItem key={year} value={year.toString()}>
-                          {year === 1 ? '1st Year' :
-                           year === 2 ? '2nd Year' :
-                           year === 3 ? '3rd Year' :
-                           year === 4 ? '4th Year' : `${year}th Year`}
+                          Year {year}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div>
-                  <label className="block text-sm font-medium mb-2">Semester</label>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Semester</label>
                   <Select value={filters.semester} onValueChange={(value) => setFilters(prev => ({ ...prev, semester: value }))}>
-                    <SelectTrigger>
+                    <SelectTrigger className="bg-white">
                       <SelectValue placeholder="Select semester" />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="bg-white">
                       {filterOptions.semesters.map(sem => (
                         <SelectItem key={sem} value={sem.toString()}>
-                          {sem === 1 ? '1st Semester' : '2nd Semester'}
+                          Semester {sem}
                         </SelectItem>
                       ))}
                     </SelectContent>
