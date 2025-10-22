@@ -74,7 +74,7 @@ export default function ResultAnalysis({ filters }: ResultAnalysisProps) {
   const [error, setError] = useState<string | null>(null);
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [selectedSubject, setSelectedSubject] = useState<string>('all');
-  const { data: subjectCredits, isLoading: creditsLoading } = useSubjectCredits();
+  const [selectedPassFailSubject, setSelectedPassFailSubject] = useState<string>('');
 
   const fetchAnalysis = async () => {
     if (!filters.batch || !filters.department || !filters.year || !filters.semester) {
@@ -393,8 +393,9 @@ export default function ResultAnalysis({ filters }: ResultAnalysisProps) {
       </div>
 
       <Tabs defaultValue="overview" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="overview">Overview Analysis</TabsTrigger>
+          <TabsTrigger value="pass-fail">Pass/Fail Analysis</TabsTrigger>
           <TabsTrigger value="cgpa">CGPA Analysis</TabsTrigger>
           <TabsTrigger value="students">Detailed Student Info</TabsTrigger>
         </TabsList>
@@ -600,6 +601,125 @@ export default function ResultAnalysis({ filters }: ResultAnalysisProps) {
               </CardContent>
             </Card>
           </div>
+        </TabsContent>
+
+        <TabsContent value="pass-fail" className="space-y-6">
+          {/* Pass/Fail Analysis */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Pass/Fail Analysis by Subject
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Select a subject to view passed and failed students for that specific subject
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="mb-6">
+                <label className="text-sm font-medium mb-2 block">Select Subject</label>
+                <Select value={selectedPassFailSubject} onValueChange={setSelectedPassFailSubject}>
+                  <SelectTrigger className="w-full max-w-md bg-white">
+                    <SelectValue placeholder="Select a subject to analyze" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-white">
+                    {subjects.map(subject => (
+                      <SelectItem key={subject} value={subject}>{subject}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {selectedPassFailSubject && analysisData?.studentDetails && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {/* Passed Students */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-green-600 flex items-center gap-2">
+                        <Award className="h-5 w-5" />
+                        Passed Students ({selectedPassFailSubject})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 max-h-96 overflow-y-auto">
+                        {(() => {
+                          const passedStudents = analysisData.studentDetails.filter(student => {
+                            const grade = student.grades[selectedPassFailSubject];
+                            return grade && !['U', 'RA', 'UA'].includes(grade);
+                          });
+                          
+                          return passedStudents.length > 0 ? (
+                            passedStudents.map(student => (
+                              <div key={student.regNo} className="flex items-center justify-between p-3 bg-green-50 rounded border border-green-200">
+                                <div>
+                                  <div className="font-medium">{student.name}</div>
+                                  <div className="text-sm text-muted-foreground">{student.regNo}</div>
+                                </div>
+                                <Badge className="bg-green-100 text-green-800 border-green-300">
+                                  {student.grades[selectedPassFailSubject]}
+                                </Badge>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <Award className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <p>No students passed this subject</p>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Failed Students */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="text-red-600 flex items-center gap-2">
+                        <AlertTriangle className="h-5 w-5" />
+                        Failed Students ({selectedPassFailSubject})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 max-h-96 overflow-y-auto">
+                        {(() => {
+                          const failedStudents = analysisData.studentDetails.filter(student => {
+                            const grade = student.grades[selectedPassFailSubject];
+                            return grade && ['U', 'RA', 'UA'].includes(grade);
+                          });
+                          
+                          return failedStudents.length > 0 ? (
+                            failedStudents.map(student => (
+                              <div key={student.regNo} className="flex items-center justify-between p-3 bg-red-50 rounded border border-red-200">
+                                <div>
+                                  <div className="font-medium">{student.name}</div>
+                                  <div className="text-sm text-muted-foreground">{student.regNo}</div>
+                                </div>
+                                <Badge variant="destructive">
+                                  {student.grades[selectedPassFailSubject]}
+                                </Badge>
+                              </div>
+                            ))
+                          ) : (
+                            <div className="text-center py-8 text-muted-foreground">
+                              <AlertTriangle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                              <p>No students failed this subject</p>
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              )}
+
+              {!selectedPassFailSubject && (
+                <div className="text-center py-12 text-muted-foreground">
+                  <BookOpen className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>Please select a subject to view pass/fail analysis</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </TabsContent>
 
         <TabsContent value="cgpa" className="space-y-6">
