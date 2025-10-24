@@ -124,7 +124,7 @@ export default function AdminQPsPage() {
                 <p className="text-sm text-slate-600 font-medium">Advanced QP Management System</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               {mounted && (
                 <div className="hidden md:flex flex-col items-end text-sm bg-white/50 rounded-xl px-3 py-2 backdrop-blur-sm">
                   <span className="text-slate-700 font-semibold">
@@ -136,9 +136,10 @@ export default function AdminQPsPage() {
                 </div>
               )}
               <Link href="/admin">
-                <button className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Back to Admin</span>
+                <button className="px-3 py-2 sm:px-4 text-xs sm:text-sm rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-1 sm:gap-2">
+                  <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Back to Admin</span>
+                  <span className="sm:hidden">Back</span>
                 </button>
               </Link>
             </div>
@@ -150,19 +151,19 @@ export default function AdminQPsPage() {
       {showFlow ? (
         <div className="relative">
           {/* Stats Overview */}
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
               {stats.map((stat, index) => (
                 <Card key={stat.label} className={`card-hover border-none shadow-lg bg-gradient-to-br ${stat.color} text-white overflow-hidden slide-in-left`} style={{animationDelay: `${index * 100}ms`}}>
-                  <CardContent className="p-6 relative">
+                  <CardContent className="p-3 sm:p-4 lg:p-6 relative">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="text-sm opacity-90 font-medium">{stat.label}</p>
-                        <p className="text-2xl font-bold mt-2">{stat.value}</p>
+                        <p className="text-xs sm:text-sm opacity-90 font-medium">{stat.label}</p>
+                        <p className="text-lg sm:text-xl lg:text-2xl font-bold mt-1 sm:mt-2">{stat.value}</p>
                       </div>
-                      <stat.icon className="h-8 w-8 opacity-80" />
+                      <stat.icon className="h-6 w-6 sm:h-7 sm:w-7 lg:h-8 lg:w-8 opacity-80 flex-shrink-0" />
                     </div>
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-white/10 rounded-full -translate-y-8 translate-x-8"></div>
+                    <div className="absolute top-0 right-0 w-12 h-12 sm:w-16 sm:h-16 bg-white/10 rounded-full -translate-y-6 translate-x-6 sm:-translate-y-8 sm:translate-x-8"></div>
                   </CardContent>
                 </Card>
               ))}
@@ -180,15 +181,15 @@ export default function AdminQPsPage() {
             <p className="text-slate-600 text-lg">Your question paper has been successfully uploaded and processed.</p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8 mb-8 sm:mb-12">
             <Card className="glass border-white/50 shadow-xl hover:shadow-2xl transition-all duration-500">
-              <CardContent className="p-8 text-center">
-                <Upload className="h-12 w-12 text-violet-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-slate-900 mb-3">Upload Another QP</h3>
-                <p className="text-slate-600 mb-6">Continue uploading question papers for different subjects and departments.</p>
+              <CardContent className="p-6 sm:p-8 text-center">
+                <Upload className="h-10 w-10 sm:h-12 sm:w-12 text-violet-600 mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 sm:mb-3">Upload Another QP</h3>
+                <p className="text-sm sm:text-base text-slate-600 mb-4 sm:mb-6">Continue uploading question papers for different subjects and departments.</p>
                 <button
                   onClick={() => setShowFlow(true)}
-                  className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
+                  className="w-full bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105"
                 >
                   Start New Upload
                 </button>
@@ -196,12 +197,12 @@ export default function AdminQPsPage() {
             </Card>
 
             <Card className="glass border-white/50 shadow-xl hover:shadow-2xl transition-all duration-500">
-              <CardContent className="p-8 text-center">
-                <FileText className="h-12 w-12 text-indigo-600 mx-auto mb-4" />
-                <h3 className="text-xl font-bold text-slate-900 mb-3">Manage QPs</h3>
-                <p className="text-slate-600 mb-6">View, edit, or organize your uploaded question papers and manage access.</p>
+              <CardContent className="p-6 sm:p-8 text-center">
+                <FileText className="h-10 w-10 sm:h-12 sm:w-12 text-indigo-600 mx-auto mb-3 sm:mb-4" />
+                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2 sm:mb-3">Manage QPs</h3>
+                <p className="text-sm sm:text-base text-slate-600 mb-4 sm:mb-6">View, edit, or organize your uploaded question papers and manage access.</p>
                 <Link href="/admin/qps/manage">
-                  <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105">
+                  <button className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-2.5 sm:py-3 px-4 sm:px-6 rounded-xl text-sm sm:text-base font-semibold hover:shadow-lg transition-all duration-300 hover:scale-105">
                     Manage QPs
                   </button>
                 </Link>

@@ -321,7 +321,7 @@ export default function AdminTimetablePage() {
               </div>
             ) : (
               <div className="space-y-3">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   <div>
                     <label className="block text-xs text-[var(--color-text-muted)] mb-1">Number of Periods</label>
                     <Input
@@ -334,11 +334,12 @@ export default function AdminTimetablePage() {
                         setPeriodsCount(v);
                         ensureGridSize(v);
                       }}
+                      className="text-sm"
                     />
                   </div>
-                  <div className="md:col-span-2">
+                  <div className="sm:col-span-1 lg:col-span-2">
                     <label className="block text-xs text-[var(--color-text-muted)] mb-1">Period Time Ranges</label>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                       {Array.from({ length: periodsCount }).map((_, idx) => (
                         <Input
                           key={idx}
@@ -349,6 +350,7 @@ export default function AdminTimetablePage() {
                             setSlotTimes(next);
                           }}
                           placeholder={`e.g. 9.00 - 9.55 (Period ${idx + 1})`}
+                          className="text-sm"
                         />
                       ))}
                     </div>

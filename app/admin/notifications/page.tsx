@@ -101,35 +101,35 @@ export default function NotificationsPage() {
         </div>
         
         <Tabs defaultValue="send" className="space-y-8">
-          <div className="glass border-white/50 rounded-2xl p-2 shadow-xl">
-            <TabsList className="grid w-full grid-cols-4 bg-transparent gap-2">
+          <div className="glass border-white/50 rounded-2xl p-2 shadow-xl overflow-x-auto">
+            <TabsList className="grid w-full grid-cols-4 bg-transparent gap-1 sm:gap-2 min-w-max sm:min-w-0">
               <TabsTrigger 
                 value="send" 
-                className="flex items-center gap-2 px-6 py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-600 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
               >
-                <Send className="h-4 w-4" />
-                <span className="font-semibold">Send Notification</span>
+                <Send className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="font-semibold whitespace-nowrap">Send</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="templates" 
-                className="flex items-center gap-2 px-6 py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-emerald-600 data-[state=active]:to-teal-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
               >
-                <FileText className="h-4 w-4" />
-                <span className="font-semibold">Templates</span>
+                <FileText className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="font-semibold whitespace-nowrap">Templates</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="history" 
-                className="flex items-center gap-2 px-6 py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-600 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
               >
-                <History className="h-4 w-4" />
-                <span className="font-semibold">History</span>
+                <History className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="font-semibold whitespace-nowrap">History</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="stats" 
-                className="flex items-center gap-2 px-6 py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105"
+                className="flex items-center gap-1 sm:gap-2 px-3 sm:px-6 py-2 sm:py-3 rounded-xl data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-600 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-lg transition-all duration-300 hover:scale-105 text-xs sm:text-sm"
               >
-                <BarChart3 className="h-4 w-4" />
-                <span className="font-semibold">Analytics</span>
+                <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="font-semibold whitespace-nowrap">Analytics</span>
               </TabsTrigger>
             </TabsList>
           </div>
@@ -160,7 +160,7 @@ export default function NotificationsPage() {
                 </div>
               </CardHeader>
               <CardContent>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                   {[
                     { name: 'Assignment Reminder', type: 'Academic', color: 'from-blue-500 to-purple-600', icon: BookOpen },
                     { name: 'Exam Schedule', type: 'Important', color: 'from-orange-500 to-red-600', icon: Calendar },
@@ -171,13 +171,13 @@ export default function NotificationsPage() {
                   ].map((template, index) => {
                     const IconComponent = template.icon;
                     return (
-                      <div key={index} className="p-4 border border-slate-200/50 rounded-xl bg-gradient-to-br from-white/50 to-slate-50/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-105">
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className={`h-10 w-10 rounded-xl bg-gradient-to-br ${template.color} flex items-center justify-center`}>
-                            <IconComponent className="h-5 w-5 text-white" />
+                      <div key={index} className="p-3 sm:p-4 border border-slate-200/50 rounded-xl bg-gradient-to-br from-white/50 to-slate-50/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300 hover:scale-105">
+                        <div className="flex items-center gap-2 sm:gap-3 mb-3">
+                          <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-gradient-to-br ${template.color} flex items-center justify-center flex-shrink-0`}>
+                            <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                           </div>
-                          <div>
-                            <h3 className="font-bold text-slate-900">{template.name}</h3>
+                          <div className="min-w-0 flex-1">
+                            <h3 className="font-bold text-slate-900 text-sm sm:text-base truncate">{template.name}</h3>
                             <p className="text-xs text-slate-600">{template.type}</p>
                           </div>
                         </div>

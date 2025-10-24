@@ -426,11 +426,12 @@ Check console for detailed logs.`);
                 <p className="text-sm text-slate-600 font-medium">AI-Powered Assignment Analysis</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Link href="/admin">
-                <button className="px-4 py-2 text-sm rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-2">
-                  <ArrowLeft className="h-4 w-4" />
-                  <span>Back to Admin</span>
+                <button className="px-3 py-2 sm:px-4 text-xs sm:text-sm rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center gap-1 sm:gap-2">
+                  <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Back to Admin</span>
+                  <span className="sm:hidden">Back</span>
                 </button>
               </Link>
             </div>
@@ -507,14 +508,14 @@ Check console for detailed logs.`);
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
               <div className="space-y-2">
-                <Label htmlFor="assignment" className="text-sm font-semibold text-slate-700">Assignment</Label>
+                <Label htmlFor="assignment" className="text-xs sm:text-sm font-semibold text-slate-700">Assignment</Label>
                 <select
                   id="assignment"
                   value={selectedAssignment}
                   onChange={(e) => setSelectedAssignment(e.target.value)}
-                  className="w-full p-3 border border-slate-200 rounded-xl bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                  className="w-full p-2 sm:p-3 text-sm border border-slate-200 rounded-xl bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                 >
                   <option value="">All Assignments</option>
                   {assignments.map((assignment) => (
@@ -526,12 +527,12 @@ Check console for detailed logs.`);
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="class_year" className="text-sm font-semibold text-slate-700">Class Year</Label>
+                <Label htmlFor="class_year" className="text-xs sm:text-sm font-semibold text-slate-700">Class Year</Label>
                 <select
                   id="class_year"
                   value={filters.class_year}
                   onChange={(e) => setFilters(prev => ({ ...prev, class_year: e.target.value }))}
-                  className="w-full p-3 border border-slate-200 rounded-xl bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                  className="w-full p-2 sm:p-3 text-sm border border-slate-200 rounded-xl bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                 >
                   <option value="">All Classes</option>
                   <option value="I-IT">I-IT (1st Year)</option>
@@ -542,7 +543,7 @@ Check console for detailed logs.`);
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="min_similarity" className="text-sm font-semibold text-slate-700">Min Similarity (%)</Label>
+                <Label htmlFor="min_similarity" className="text-xs sm:text-sm font-semibold text-slate-700">Min Similarity (%)</Label>
                 <Input
                   id="min_similarity"
                   type="number"
@@ -550,7 +551,7 @@ Check console for detailed logs.`);
                   max="100"
                   value={filters.min_similarity}
                   onChange={(e) => setFilters(prev => ({ ...prev, min_similarity: parseInt(e.target.value) || 80 }))}
-                  className="p-3 border border-slate-200 rounded-xl bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
+                  className="p-2 sm:p-3 text-sm border border-slate-200 rounded-xl bg-white/80 backdrop-blur-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-300"
                 />
               </div>
               
@@ -558,12 +559,12 @@ Check console for detailed logs.`);
                 <Button 
                   onClick={runDetection} 
                   disabled={isDetecting}
-                  className="w-full h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                  className="w-full h-10 sm:h-12 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-sm sm:text-base font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
                 >
                   {isDetecting ? (
-                    <RefreshCw className="h-5 w-5 animate-spin mr-2" />
+                    <RefreshCw className="h-4 w-4 sm:h-5 sm:w-5 animate-spin mr-2" />
                   ) : (
-                    <Search className="h-5 w-5 mr-2" />
+                    <Search className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
                   )}
                   {isDetecting ? "Analyzing..." : "Run Detection"}
                 </Button>
@@ -625,21 +626,21 @@ Check console for detailed logs.`);
                         </p>
                       </div>
                       
-                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                         {group.submissions.map((submission: AssignmentSubmission, submissionIndex: number) => (
-                        <div key={submissionIndex} className="p-4 border border-slate-200/50 rounded-xl bg-gradient-to-br from-slate-50/50 to-white/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
-                          <div className="flex items-center justify-between mb-3">
-                            <div className="flex items-center gap-2">
-                              <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                <Users className="h-4 w-4 text-white" />
+                        <div key={submissionIndex} className="p-3 sm:p-4 border border-slate-200/50 rounded-xl bg-gradient-to-br from-slate-50/50 to-white/50 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
+                          <div className="flex items-center justify-between mb-2 sm:mb-3 gap-2">
+                            <div className="flex items-center gap-2 min-w-0 flex-1">
+                              <div className="h-7 w-7 sm:h-8 sm:w-8 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                                <Users className="h-3 w-3 sm:h-4 sm:w-4 text-white" />
                               </div>
-                              <span className="text-sm font-bold text-slate-900">
+                              <span className="text-xs sm:text-sm font-bold text-slate-900 truncate">
                                 {submission.student_name || 'Unknown Student'}
                               </span>
                             </div>
                             <Badge 
                               variant={submission.status === 'flagged' ? 'destructive' : 'secondary'}
-                              className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-xs font-semibold flex-shrink-0 ${
                                 submission.status === 'flagged' 
                                   ? 'bg-gradient-to-r from-red-500 to-pink-600 text-white' 
                                   : 'bg-gradient-to-r from-slate-500 to-slate-600 text-white'
@@ -648,13 +649,13 @@ Check console for detailed logs.`);
                               {submission.status || 'pending'}
                             </Badge>
                           </div>
-                          <div className="flex items-center gap-2 mb-3">
-                            <FileText className="h-4 w-4 text-slate-500" />
-                            <p className="text-sm text-slate-700 font-medium truncate">
+                          <div className="flex items-center gap-2 mb-2 sm:mb-3 min-w-0">
+                            <FileText className="h-3 w-3 sm:h-4 sm:w-4 text-slate-500 flex-shrink-0" />
+                            <p className="text-xs sm:text-sm text-slate-700 font-medium truncate">
                               {submission.file_name}
                             </p>
                           </div>
-                          <div className="flex items-center gap-4 text-xs text-slate-500 mb-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 text-xs text-slate-500 mb-2 sm:mb-3">
                             <div className="flex items-center gap-1">
                               <Calendar className="h-3 w-3" />
                               <span>{new Date(submission.submitted_at).toLocaleDateString()}</span>
@@ -677,7 +678,7 @@ Check console for detailed logs.`);
                             <Button
                               onClick={() => deleteSubmission(submission.id, group.group_id)}
                               size="sm"
-                              className="px-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+                              className="px-2 sm:px-3 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
                             >
                               <Trash2 className="h-3 w-3" />
                             </Button>

@@ -55,6 +55,7 @@ export default function ModernHolidayManagement({
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [isLoadingHolidays, setIsLoadingHolidays] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showBulkForm, setShowBulkForm] = useState(false);
   const [filters, setFilters] = useState({
     type: "all",
     upcoming: false,
@@ -65,6 +66,20 @@ export default function ModernHolidayManagement({
   const [newHoliday, setNewHoliday] = useState({
     holidayName: "",
     holidayDate: "",
+    holidayType: "national",
+    description: "",
+    isAnnounced: true,
+    announcedDate: "",
+    createdBy: "admin",
+    affectsSeminars: true,
+    affectsAssignments: false,
+    affectsExams: false,
+  });
+
+  const [bulkHoliday, setBulkHoliday] = useState({
+    holidayName: "",
+    startDate: "",
+    endDate: "",
     holidayType: "national",
     description: "",
     isAnnounced: true,
@@ -159,6 +174,60 @@ export default function ModernHolidayManagement({
     }
   };
 
+  const handleBulkAddHolidays = async () => {
+    if (
+      !bulkHoliday.holidayName ||
+      !bulkHoliday.startDate ||
+      !bulkHoliday.endDate ||
+      !bulkHoliday.holidayType
+    ) {
+      alert("Holiday name, start date, end date, and type are required");
+      return;
+    }
+
+    const start = new Date(bulkHoliday.startDate);
+    const end = new Date(bulkHoliday.endDate);
+
+    if (start > end) {
+      alert("Start date must be before or equal to end date");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/admin/holidays/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(bulkHoliday),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        fetchHolidays();
+        setShowBulkForm(false);
+        setBulkHoliday({
+          holidayName: "",
+          startDate: "",
+          endDate: "",
+          holidayType: "national",
+          description: "",
+          isAnnounced: true,
+          announcedDate: "",
+          createdBy: "admin",
+          affectsSeminars: true,
+          affectsAssignments: false,
+          affectsExams: false,
+        });
+        alert(`Successfully created ${data.count} holidays!`);
+      } else {
+        alert(`Failed to add holidays: ${data.error}`);
+      }
+    } catch (error) {
+      console.error("Error adding bulk holidays:", error);
+      alert("Failed to add holidays. Please try again.");
+    }
+  };
+
   const handleDeleteHoliday = async (
     holidayId: string,
     holidayName: string
@@ -245,6 +314,10 @@ export default function ModernHolidayManagement({
             <Plus className="h-4 w-4 mr-2" />
             Add Holiday
           </Button>
+          <Button onClick={() => setShowBulkForm(true)} size="sm" variant="secondary">
+            <Calendar className="h-4 w-4 mr-2" />
+            Bulk Add
+          </Button>
         </div>
       </div>
 
@@ -321,6 +394,197 @@ export default function ModernHolidayManagement({
           </div>
         </CardContent>
       </Card>
+
+      {/* Bulk Add Holiday Form */}
+      {showBulkForm && (
+        <Card>
+          <CardHeader>
+            <div className="flex justify-between items-center">
+              <CardTitle>Bulk Add Holidays</CardTitle>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowBulkForm(false)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <CardDescription>
+              Create holidays for each day in a date range with the same message
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="bulk-holiday-name">Holiday Name *</Label>
+                <Input
+                  id="bulk-holiday-name"
+                  value={bulkHoliday.holidayName}
+                  onChange={(e) =>
+                    setBulkHoliday({
+                      ...bulkHoliday,
+                      holidayName: e.target.value,
+                    })
+                  }
+                  placeholder="Enter holiday name"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="bulk-holiday-type">Holiday Type *</Label>
+                <select
+                  id="bulk-holiday-type"
+                  value={bulkHoliday.holidayType}
+                  onChange={(e) =>
+                    setBulkHoliday({
+                      ...bulkHoliday,
+                      holidayType: e.target.value,
+                    })
+                  }
+                  className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  {holidayTypes.map((type) => (
+                    <option key={type.value} value={type.value}>
+                      {type.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="bulk-start-date">Start Date *</Label>
+                <Input
+                  id="bulk-start-date"
+                  type="date"
+                  value={bulkHoliday.startDate}
+                  onChange={(e) =>
+                    setBulkHoliday({
+                      ...bulkHoliday,
+                      startDate: e.target.value,
+                    })
+                  }
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="bulk-end-date">End Date *</Label>
+                <Input
+                  id="bulk-end-date"
+                  type="date"
+                  value={bulkHoliday.endDate}
+                  onChange={(e) =>
+                    setBulkHoliday({
+                      ...bulkHoliday,
+                      endDate: e.target.value,
+                    })
+                  }
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="bulk-announced-date">Announced Date</Label>
+                <Input
+                  id="bulk-announced-date"
+                  type="date"
+                  value={bulkHoliday.announcedDate}
+                  onChange={(e) =>
+                    setBulkHoliday({
+                      ...bulkHoliday,
+                      announcedDate: e.target.value,
+                    })
+                  }
+                  className="mt-1"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="bulk-description">Description</Label>
+                <Textarea
+                  id="bulk-description"
+                  value={bulkHoliday.description}
+                  onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                    setBulkHoliday({
+                      ...bulkHoliday,
+                      description: e.target.value,
+                    })
+                  }
+                  placeholder="Enter holiday description (will be applied to all dates)"
+                  className="mt-1"
+                  rows={3}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label>Affects</Label>
+                <div className="flex flex-wrap gap-4 mt-2">
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={bulkHoliday.affectsSeminars}
+                      onChange={(e) =>
+                        setBulkHoliday({
+                          ...bulkHoliday,
+                          affectsSeminars: e.target.checked,
+                        })
+                      }
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm">Seminars</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={bulkHoliday.affectsAssignments}
+                      onChange={(e) =>
+                        setBulkHoliday({
+                          ...bulkHoliday,
+                          affectsAssignments: e.target.checked,
+                        })
+                      }
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm">Assignments</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={bulkHoliday.affectsExams}
+                      onChange={(e) =>
+                        setBulkHoliday({
+                          ...bulkHoliday,
+                          affectsExams: e.target.checked,
+                        })
+                      }
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm">Exams</span>
+                  </label>
+                  <label className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      checked={bulkHoliday.isAnnounced}
+                      onChange={(e) =>
+                        setBulkHoliday({
+                          ...bulkHoliday,
+                          isAnnounced: e.target.checked,
+                        })
+                      }
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                    <span className="text-sm">Is Announced</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            <div className="flex justify-end gap-2 mt-6">
+              <Button variant="outline" onClick={() => setShowBulkForm(false)}>
+                Cancel
+              </Button>
+              <Button onClick={handleBulkAddHolidays}>
+                <Save className="h-4 w-4 mr-2" />
+                Create Holidays
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Add Holiday Form */}
       {showAddForm && (

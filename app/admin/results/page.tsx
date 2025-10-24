@@ -439,20 +439,21 @@ export default function ResultsManagementPage() {
           <CardTitle>Result Sheet Configuration</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div className="space-y-2">
-              <label className="text-sm font-medium">Batch</label>
+              <label className="text-xs sm:text-sm font-medium">Batch</label>
               <Input
                 value={filters.batch}
                 onChange={(e) => handleFilterChange('batch', e.target.value)}
                 placeholder="e.g., 2023-2027"
+                className="text-sm"
               />
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Department</label>
+              <label className="text-xs sm:text-sm font-medium">Department</label>
               <Select value={filters.department} onValueChange={(value) => handleFilterChange('department', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm">
                   <SelectValue placeholder="Select department" />
                 </SelectTrigger>
                 <SelectContent>
@@ -464,9 +465,9 @@ export default function ResultsManagementPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Year</label>
+              <label className="text-xs sm:text-sm font-medium">Year</label>
               <Select value={filters.year} onValueChange={(value) => handleFilterChange('year', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm">
                   <SelectValue placeholder="Select year" />
                 </SelectTrigger>
                 <SelectContent>
@@ -478,9 +479,9 @@ export default function ResultsManagementPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-medium">Semester</label>
+              <label className="text-xs sm:text-sm font-medium">Semester</label>
               <Select value={filters.semester} onValueChange={(value) => handleFilterChange('semester', value)}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm">
                   <SelectValue placeholder="Select semester" />
                 </SelectTrigger>
                 <SelectContent>
@@ -491,9 +492,9 @@ export default function ResultsManagementPage() {
               </Select>
             </div>
             <div className="space-y-2">
-              <label className="text-sm font-medium">Class</label>
+              <label className="text-xs sm:text-sm font-medium">Class</label>
               <Select value={classYear} onValueChange={setClassYear}>
-                <SelectTrigger>
+                <SelectTrigger className="text-sm">
                   <SelectValue placeholder="Select class" />
                 </SelectTrigger>
                 <SelectContent>
@@ -503,20 +504,22 @@ export default function ResultsManagementPage() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-sm font-medium">Exam Cycle</label>
+            <div className="space-y-2 sm:col-span-2 lg:col-span-2">
+              <label className="text-xs sm:text-sm font-medium">Exam Cycle</label>
               <Input
                 value={examCycle}
                 onChange={(e) => setExamCycle(e.target.value)}
                 placeholder="e.g., NOV/DEC 2024"
+                className="text-sm"
               />
             </div>
-            <div className="space-y-2 md:col-span-1">
-              <label className="text-sm font-medium">Year Label</label>
+            <div className="space-y-2">
+              <label className="text-xs sm:text-sm font-medium">Year Label</label>
               <Input
                 value={yearLabel}
                 onChange={(e) => setYearLabel(e.target.value)}
                 placeholder="e.g., II-IT"
+                className="text-sm"
               />
             </div>
           </div>
@@ -544,21 +547,23 @@ export default function ResultsManagementPage() {
 
       {/* Main Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="create" className="flex items-center gap-2">
-            <Upload className="h-4 w-4" />
-            Create Results
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-0">
+          <TabsTrigger value="create" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
+            <Upload className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Create Results</span>
+            <span className="sm:hidden">Create</span>
           </TabsTrigger>
-          <TabsTrigger value="update" className="flex items-center gap-2">
-            <Edit className="h-4 w-4" />
-            Update/Edit
+          <TabsTrigger value="update" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
+            <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Update/Edit</span>
+            <span className="sm:hidden">Update</span>
           </TabsTrigger>
-          <TabsTrigger value="preview" className="flex items-center gap-2">
-            <Eye className="h-4 w-4" />
+          <TabsTrigger value="preview" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
+            <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
             Preview
           </TabsTrigger>
-          <TabsTrigger value="export" className="flex items-center gap-2">
-            <Download className="h-4 w-4" />
+          <TabsTrigger value="export" className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm px-2 sm:px-4">
+            <Download className="h-3 w-3 sm:h-4 sm:w-4" />
             Export
           </TabsTrigger>
         </TabsList>
@@ -572,20 +577,20 @@ export default function ResultsManagementPage() {
               </p>
             </CardHeader>
             <CardContent>
-              <div className="mb-4 flex flex-col md:flex-row gap-3">
+              <div className="mb-4 flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <Button
                   onClick={handleGenerateSheet}
                   disabled={!isGenerateReady || generating}
-                  className="w-full md:w-auto"
+                  className="w-full sm:w-auto text-sm"
                 >
                   {generating ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <Loader2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
                       Generating...
                     </>
                   ) : (
                     <>
-                      <PlusSquare className="mr-2 h-4 w-4" />
+                      <PlusSquare className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Generate Empty Sheet
                     </>
                   )}
@@ -595,9 +600,9 @@ export default function ResultsManagementPage() {
                   onClick={handlePreview}
                   disabled={!isGenerateReady}
                   variant="outline"
-                  className="w-full md:w-auto"
+                  className="w-full sm:w-auto text-sm"
                 >
-                  <Eye className="mr-2 h-4 w-4" />
+                  <Eye className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                   Preview Structure
                 </Button>
               </div>

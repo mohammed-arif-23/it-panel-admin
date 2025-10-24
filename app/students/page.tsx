@@ -372,48 +372,48 @@ export default function StudentsManagement() {
           </Card>
 
           {/* Stats */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-6">
             <Card className="saas-card">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-[var(--color-text-muted)]">Total Students</p>
-                    <p className="text-2xl font-bold text-[var(--color-text-primary)]">{totalCount}</p>
+                    <p className="text-xs sm:text-sm text-[var(--color-text-muted)]">Total Students</p>
+                    <p className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)]">{totalCount}</p>
                   </div>
-                  <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                    <Users className="h-5 w-5 text-blue-600" />
+                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
+                    <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
             
             <Card className="saas-card">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-[var(--color-text-muted)]">Verified Accounts</p>
-                    <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                    <p className="text-xs sm:text-sm text-[var(--color-text-muted)]">Verified Accounts</p>
+                    <p className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)]">
                       {students.filter(s => s.email_verified).length}
                     </p>
                   </div>
-                  <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
-                    <Eye className="h-5 w-5 text-green-600" />
+                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                    <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                   </div>
                 </div>
               </CardContent>
             </Card>
             
             <Card className="saas-card">
-              <CardContent className="p-4">
+              <CardContent className="p-3 sm:p-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm text-[var(--color-text-muted)]">Pending Verification</p>
-                    <p className="text-2xl font-bold text-[var(--color-text-primary)]">
+                    <p className="text-xs sm:text-sm text-[var(--color-text-muted)]">Pending Verification</p>
+                    <p className="text-xl sm:text-2xl font-bold text-[var(--color-text-primary)]">
                       {students.filter(s => !s.email_verified).length}
                     </p>
                   </div>
-                  <div className="h-10 w-10 rounded-lg bg-yellow-100 flex items-center justify-center">
-                    <Eye className="h-5 w-5 text-yellow-600" />
+                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                    <Eye className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
                   </div>
                 </div>
               </CardContent>
@@ -560,28 +560,31 @@ export default function StudentsManagement() {
                               </span>
                             )}
                           </td>
-                          <td className="py-3 px-4 text-right">
-                            <div className="flex justify-end gap-2">
+                          <td className="py-3 px-2 sm:px-4 text-right">
+                            <div className="flex justify-end gap-1 sm:gap-2">
                               <Button 
                                 variant="outline" 
                                 size="sm"
                                 onClick={() => handleViewStudent(student.id)}
+                                className="p-2"
                               >
-                                <Eye className="h-4 w-4" />
+                                <Eye className="h-3 w-3 sm:h-4 sm:w-4" />
                               </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm"
                                 onClick={() => handleEditStudent(student.id)}
+                                className="p-2"
                               >
-                                <Edit className="h-4 w-4" />
+                                <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
                               </Button>
                               <Button 
                                 variant="outline" 
                                 size="sm"
                                 onClick={() => handleDeleteStudent(student.id, student.name)}
+                                className="p-2"
                               >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                               </Button>
                             </div>
                           </td>

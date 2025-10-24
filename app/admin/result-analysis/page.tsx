@@ -129,19 +129,20 @@ export default function ResultAnalysisPage() {
     <div className="min-h-screen bg-[var(--color-background)] p-6">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 mb-6">
           <Button
             variant="outline"
             size="sm"
             onClick={() => router.push('/admin')}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-sm"
           >
-            <ArrowLeft className="h-4 w-4" />
-            Back to Admin
+            <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Back to Admin</span>
+            <span className="sm:hidden">Back</span>
           </Button>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Result Analysis Dashboard</h1>
-            <p className="text-slate-600">Comprehensive analytics and insights for student results</p>
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-slate-900">Result Analysis Dashboard</h1>
+            <p className="text-xs sm:text-sm lg:text-base text-slate-600">Comprehensive analytics and insights for student results</p>
           </div>
         </div>
 
@@ -169,27 +170,27 @@ export default function ResultAnalysisPage() {
                 <span className="ml-2">Loading filter options...</span>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Batch</label>
+                  <label className="text-xs sm:text-sm font-medium">Batch</label>
                   <input
                     type="text"
                     value={filters.batch}
                     onChange={(e) => setFilters(prev => ({ ...prev, batch: e.target.value }))}
                     placeholder="e.g., 2023-2027"
-                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Department</label>
+                  <label className="text-xs sm:text-sm font-medium">Department</label>
                   <Select value={filters.department} onValueChange={(value) => setFilters(prev => ({ ...prev, department: value }))}>
-                    <SelectTrigger className="bg-white">
+                    <SelectTrigger className="bg-white text-sm">
                       <SelectValue placeholder="Select department" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {filterOptions.departments.map(dept => (
-                        <SelectItem key={dept} value={dept}>
+                        <SelectItem key={dept} value={dept} className="text-sm">
                           {dept === 'IT' ? 'Information Technology' :
                            dept === 'CSE' ? 'Computer Science & Engineering' :
                            dept === 'ECE' ? 'Electronics & Communication' :
@@ -203,14 +204,14 @@ export default function ResultAnalysisPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Year</label>
+                  <label className="text-xs sm:text-sm font-medium">Year</label>
                   <Select value={filters.year} onValueChange={(value) => setFilters(prev => ({ ...prev, year: value }))}>
-                    <SelectTrigger className="bg-white">
+                    <SelectTrigger className="bg-white text-sm">
                       <SelectValue placeholder="Select year" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {filterOptions.years.map(year => (
-                        <SelectItem key={year} value={year.toString()}>
+                        <SelectItem key={year} value={year.toString()} className="text-sm">
                           Year {year}
                         </SelectItem>
                       ))}
@@ -219,14 +220,14 @@ export default function ResultAnalysisPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium">Semester</label>
+                  <label className="text-xs sm:text-sm font-medium">Semester</label>
                   <Select value={filters.semester} onValueChange={(value) => setFilters(prev => ({ ...prev, semester: value }))}>
-                    <SelectTrigger className="bg-white">
+                    <SelectTrigger className="bg-white text-sm">
                       <SelectValue placeholder="Select semester" />
                     </SelectTrigger>
                     <SelectContent className="bg-white">
                       {filterOptions.semesters.map(sem => (
-                        <SelectItem key={sem} value={sem.toString()}>
+                        <SelectItem key={sem} value={sem.toString()} className="text-sm">
                           Semester {sem}
                         </SelectItem>
                       ))}

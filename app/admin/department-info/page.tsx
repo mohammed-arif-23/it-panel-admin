@@ -214,29 +214,33 @@ export default function DepartmentInfoAdminPage() {
                   </div>
                   <div className="space-y-4">
                     {staff.map((s, i) => (
-                      <div key={i} className="grid md:grid-cols-4 gap-3 p-3 border rounded-lg bg-muted/30">
+                      <div key={i} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 p-3 border rounded-lg bg-muted/30">
                         <Input
                           placeholder="Name"
                           value={s.name}
                           onChange={(e) => updateStaffField(i, 'name', e.target.value)}
+                          className="text-sm"
                         />
                         <Input
                           placeholder="Designation"
                           value={s.designation}
                           onChange={(e) => updateStaffField(i, 'designation', e.target.value)}
+                          className="text-sm"
                         />
                         <Input
                           placeholder="Position"
                           value={s.position}
                           onChange={(e) => updateStaffField(i, 'position', e.target.value)}
+                          className="text-sm"
                         />
-                        <div className="flex gap-2">
+                        <div className="flex gap-2 sm:col-span-2 lg:col-span-1">
                           <Input
                             placeholder="Image URL"
                             value={s.imageUrl}
                             onChange={(e) => updateStaffField(i, 'imageUrl', e.target.value)}
+                            className="text-sm flex-1"
                           />
-                          <Button type="button" variant="destructive" onClick={() => removeStaff(i)}>
+                          <Button type="button" variant="destructive" onClick={() => removeStaff(i)} size="sm" className="flex-shrink-0">
                             Remove
                           </Button>
                         </div>

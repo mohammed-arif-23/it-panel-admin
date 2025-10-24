@@ -221,6 +221,7 @@ export async function GET(request: NextRequest) {
     const fineType = searchParams.get("type") || "all";
     const dateFrom = searchParams.get("from");
     const dateTo = searchParams.get("to");
+    const studentId = searchParams.get("student_id");
 
     // Check if the fines table exists
     let finesExist = false;
@@ -286,6 +287,10 @@ export async function GET(request: NextRequest) {
       .order("created_at", { ascending: false });
 
     // Apply filters
+    if (studentId) {
+      finesQuery = finesQuery.eq("student_id", studentId);
+    }
+
     if (classYear !== "all") {
       finesQuery = finesQuery.eq("unified_students.class_year", classYear);
     }

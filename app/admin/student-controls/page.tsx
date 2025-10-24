@@ -289,23 +289,25 @@ export default function StudentControlsPage() {
                 <p className="text-sm text-slate-600 font-medium">Manage student access and notifications</p>
               </div>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               <Button
                 onClick={saveConfiguration}
                 disabled={isLoading}
-                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+                className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 text-sm"
               >
                 {isLoading ? (
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
                 ) : (
                   <Save className="h-4 w-4 mr-2" />
                 )}
-                Save Changes
+                <span className="hidden sm:inline">Save Changes</span>
+                <span className="sm:hidden">Save</span>
               </Button>
-              <Link href="/admin">
-                <Button variant="outline" className="px-4 py-2 rounded-xl border-white/50 hover:bg-white/80 backdrop-blur-sm">
+              <Link href="/admin" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full px-4 py-2 rounded-xl border-white/50 hover:bg-white/80 backdrop-blur-sm text-sm">
                   <ArrowLeft className="h-4 w-4 mr-2" />
-                  Back to Admin
+                  <span className="hidden sm:inline">Back to Admin</span>
+                  <span className="sm:hidden">Back</span>
                 </Button>
               </Link>
             </div>
@@ -315,60 +317,60 @@ export default function StudentControlsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
           <Card className="glass border-white/50 shadow-xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 font-medium">Active Features</p>
-                  <p className="text-2xl font-bold text-slate-900">{enabledCount}/{features.length}</p>
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium">Active Features</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">{enabledCount}/{features.length}</p>
                 </div>
-                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                  <CheckCircle className="h-6 w-6 text-white" />
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="glass border-white/50 shadow-xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 font-medium">Notification Rules</p>
-                  <p className="text-2xl font-bold text-slate-900">{activeRulesCount}/{notificationRules.length}</p>
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium">Notification Rules</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">{activeRulesCount}/{notificationRules.length}</p>
                 </div>
-                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center">
-                  <Bell className="h-6 w-6 text-white" />
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
+                  <Bell className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="glass border-white/50 shadow-xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 font-medium">Affected Students</p>
-                  <p className="text-2xl font-bold text-slate-900">450</p>
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium">Affected Students</p>
+                  <p className="text-xl sm:text-2xl font-bold text-slate-900">450</p>
                 </div>
-                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center">
-                  <Users className="h-6 w-6 text-white" />
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center flex-shrink-0">
+                  <Users className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="glass border-white/50 shadow-xl">
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-slate-600 font-medium">Last Saved</p>
-                  <p className="text-sm font-bold text-slate-900">
+                  <p className="text-xs sm:text-sm text-slate-600 font-medium">Last Saved</p>
+                  <p className="text-xs sm:text-sm font-bold text-slate-900">
                     {lastSaved ? lastSaved.toLocaleTimeString() : 'Not saved'}
                   </p>
                 </div>
-                <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-white" />
+                <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center flex-shrink-0">
+                  <Shield className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
               </div>
             </CardContent>
@@ -396,7 +398,7 @@ export default function StudentControlsPage() {
                     ({features.filter(f => f.category === category && f.enabled).length}/{features.filter(f => f.category === category).length} active)
                   </span>
                 </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                   {features
                     .filter(feature => feature.category === category)
                     .sort((a, b) => a.priority - b.priority)
@@ -405,36 +407,37 @@ export default function StudentControlsPage() {
                       return (
                         <div
                           key={feature.id}
-                          className={`p-4 rounded-xl border transition-all duration-300 ${
+                          className={`p-3 sm:p-4 rounded-xl border transition-all duration-300 ${
                             feature.enabled
                               ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200 shadow-sm'
                               : 'bg-gradient-to-br from-red-50 to-rose-50 border-red-200 shadow-sm'
                           }`}
                         >
                           <div className="flex items-start justify-between mb-3">
-                            <div className="flex items-center gap-3">
-                              <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${
+                            <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+                              <div className={`h-8 w-8 sm:h-10 sm:w-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                                 feature.enabled
                                   ? 'bg-gradient-to-br from-green-500 to-emerald-600'
                                   : 'bg-gradient-to-br from-red-500 to-rose-600'
                               }`}>
-                                <IconComponent className="h-5 w-5 text-white" />
+                                <IconComponent className="h-4 w-4 sm:h-5 sm:w-5 text-white" />
                               </div>
-                              <div>
-                                <h4 className="font-bold text-slate-900">{feature.title}</h4>
+                              <div className="min-w-0 flex-1">
+                                <h4 className="font-bold text-slate-900 text-sm sm:text-base truncate">{feature.title}</h4>
                                 <p className="text-xs text-slate-600">{feature.affectedStudents} students</p>
                               </div>
                             </div>
                             <Switch
                               checked={feature.enabled}
                               onCheckedChange={() => toggleFeature(feature.id)}
+                              className="flex-shrink-0"
                             />
                           </div>
-                          <p className="text-sm text-slate-600 mb-3">{feature.description}</p>
+                          <p className="text-xs sm:text-sm text-slate-600 mb-3">{feature.description}</p>
                           <div className="flex items-center justify-between text-xs text-slate-500">
                             <span>Priority: {feature.priority}</span>
                             {feature.lastModified && (
-                              <span>Modified: {new Date(feature.lastModified).toLocaleDateString()}</span>
+                              <span className="hidden sm:inline">Modified: {new Date(feature.lastModified).toLocaleDateString()}</span>
                             )}
                           </div>
                         </div>
